@@ -6,13 +6,13 @@
  *
  */
 
-import {Class, $ReadOnly} from 'utility-types';
+import {Class, Readonly} from 'utility-types';
 
 /**
  * LexicalCommands
  */
 
-export type LexicalCommand<P> = $ReadOnly<{}>;
+export type LexicalCommand<P> = Readonly<{}>;
 
 export var SELECTION_CHANGE_COMMAND: LexicalCommand<void>;
 export var CLICK_COMMAND: LexicalCommand<MouseEvent>;
@@ -345,7 +345,7 @@ export declare class LexicalNode {
   getTopLevelElementOrThrow(): ElementNode;
   getParents(): Array<ElementNode>;
   getParentKeys(): Array<NodeKey>;
-  getPreviousSibling(): LexicalNode | null;
+  getPreviousSibling<T extends LexicalNode>(): T | null;
   getPreviousSiblings(): Array<LexicalNode>;
   getNextSibling(): LexicalNode | null;
   getNextSiblings(): Array<LexicalNode>;

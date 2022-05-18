@@ -4,7 +4,6 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- * @flow strict
  */
 
 import type {
@@ -19,7 +18,7 @@ import {addClassNamesToElement} from '@lexical/utils';
 import {GridRowNode} from 'lexical';
 
 export class TableRowNode extends GridRowNode {
-  __height: ?number;
+  __height: number;
 
   static getType(): 'tablerow' {
     return 'tablerow';
@@ -38,7 +37,7 @@ export class TableRowNode extends GridRowNode {
     };
   }
 
-  constructor(height?: ?number, key?: NodeKey): void {
+  constructor(height?: number, key?: NodeKey) {
     super(key);
     this.__height = height;
   }
@@ -55,14 +54,14 @@ export class TableRowNode extends GridRowNode {
     return element;
   }
 
-  setHeight(height: number): ?number {
-    const self = this.getWritable();
+  setHeight(height: number): number {
+    const self = this.getWritable<TableRowNode>();
     self.__height = height;
     return this.__height;
   }
 
-  getHeight(): ?number {
-    return this.getLatest().__height;
+  getHeight(): number {
+    return this.getLatest<TableRowNode>().__height;
   }
 
   updateDOM(prevNode: TableRowNode): boolean {
@@ -82,10 +81,12 @@ export function convertTableRowElement(domNode: Node): DOMConversionOutput {
   return {node: $createTableRowNode()};
 }
 
-export function $createTableRowNode(height?: ?number): TableRowNode {
+export function $createTableRowNode(height?: number): TableRowNode {
   return new TableRowNode(height);
 }
 
-export function $isTableRowNode(node: ?LexicalNode): boolean %checks {
+export function $isTableRowNode(
+  node: LexicalNode | null | undefined,
+): node is TableRowNode {
   return node instanceof TableRowNode;
 }

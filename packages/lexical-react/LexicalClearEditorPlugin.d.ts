@@ -7,8 +7,7 @@
  * @flow strict
  */
 
-import {$ReadOnly} from 'utility-types';
-type Props = $ReadOnly<{
+type Props = Readonly<{
   onClear?: () => void;
 }>;
 export function ClearEditorPlugin(arg0: Props): JSX.Element | null;

@@ -27,22 +27,22 @@ import {
 
 import {setAnchorPoint, setFocusPoint} from '../utils';
 
-// No idea why we suddenly need to do this, but it fixes the tests
-// with latest experimental React version.
-global.IS_REACT_ACT_ENVIRONMENT = true;
-
 function createParagraphWithNodes(editor, nodes) {
   const paragraph = $createParagraphNode();
   const nodeMap = editor._pendingEditorState._nodeMap;
+
   for (let i = 0; i < nodes.length; i++) {
     const {text, key, mergeable} = nodes[i];
     const textNode = new TextNode(text, key);
     nodeMap.set(key, textNode);
+
     if (!mergeable) {
       textNode.toggleUnmergeable();
     }
+
     paragraph.append(textNode);
   }
+
   return paragraph;
 }
 
@@ -55,9 +55,21 @@ describe('LexicalSelectionHelpers tests', () => {
         editor.update(() => {
           const root = $getRoot();
           const element = createParagraphWithNodes(editor, [
-            {key: 'a', mergeable: false, text: 'a'},
-            {key: 'b', mergeable: false, text: 'b'},
-            {key: 'c', mergeable: false, text: 'c'},
+            {
+              key: 'a',
+              mergeable: false,
+              text: 'a',
+            },
+            {
+              key: 'b',
+              mergeable: false,
+              text: 'b',
+            },
+            {
+              key: 'c',
+              mergeable: false,
+              text: 'c',
+            },
           ]);
           root.append(element);
           setAnchorPoint({
@@ -70,7 +82,6 @@ describe('LexicalSelectionHelpers tests', () => {
             offset: 0,
             type: 'text',
           });
-
           const selection = $getSelection();
           cb(selection, element);
         });
@@ -80,12 +91,10 @@ describe('LexicalSelectionHelpers tests', () => {
       setupTestCase((selection, state) => {
         expect(selection.getNodes()).toEqual([$getNodeByKey('a')]);
       });
-
       // getTextContent
       setupTestCase((selection) => {
         expect(selection.getTextContent()).toEqual('');
       });
-
       // insertText
       setupTestCase((selection, state) => {
         selection.insertText('Test');
@@ -105,7 +114,6 @@ describe('LexicalSelectionHelpers tests', () => {
           }),
         );
       });
-
       // insertNodes
       setupTestCase((selection, element) => {
         selection.insertNodes([$createTextNode('foo')]);
@@ -124,7 +132,6 @@ describe('LexicalSelectionHelpers tests', () => {
           }),
         );
       });
-
       // insertParagraph
       setupTestCase((selection) => {
         selection.insertParagraph();
@@ -143,7 +150,6 @@ describe('LexicalSelectionHelpers tests', () => {
           }),
         );
       });
-
       // insertLineBreak
       setupTestCase((selection, element) => {
         selection.insertLineBreak(true);
@@ -162,7 +168,6 @@ describe('LexicalSelectionHelpers tests', () => {
           }),
         );
       });
-
       // Format text
       setupTestCase((selection, element) => {
         selection.formatText('bold');
@@ -186,12 +191,10 @@ describe('LexicalSelectionHelpers tests', () => {
           'a',
         );
       });
-
       // Extract selection
       setupTestCase((selection, state) => {
         expect(selection.extract()).toEqual([$getNodeByKey('a')]);
       });
-
       // cloneContents
       setupTestCase((selection, element) => {
         expect($cloneContents(selection)).toEqual({
@@ -203,10 +206,8 @@ describe('LexicalSelectionHelpers tests', () => {
         });
       });
     });
-
     test('Has correct text point after removal after merge', async () => {
       const editor = createTestEditor();
-
       const domElement = document.createElement('div');
       let element;
 
@@ -217,11 +218,31 @@ describe('LexicalSelectionHelpers tests', () => {
         element = createParagraphWithNodes(
           editor,
           [
-            {key: 'a', mergeable: true, text: 'a'},
-            {key: 'bb', mergeable: true, text: 'bb'},
-            {key: 'empty', mergeable: true, text: ''},
-            {key: 'cc', mergeable: true, text: 'cc'},
-            {key: 'd', mergeable: true, text: 'd'},
+            {
+              key: 'a',
+              mergeable: true,
+              text: 'a',
+            },
+            {
+              key: 'bb',
+              mergeable: true,
+              text: 'bb',
+            },
+            {
+              key: 'empty',
+              mergeable: true,
+              text: '',
+            },
+            {
+              key: 'cc',
+              mergeable: true,
+              text: 'cc',
+            },
+            {
+              key: 'd',
+              mergeable: true,
+              text: 'd',
+            },
           ],
           true,
         );
@@ -258,7 +279,6 @@ describe('LexicalSelectionHelpers tests', () => {
         );
       });
     });
-
     test('Has correct text point after removal after merge (2)', async () => {
       const editor = createTestEditor();
       const domElement = document.createElement('div');
@@ -271,10 +291,26 @@ describe('LexicalSelectionHelpers tests', () => {
         element = createParagraphWithNodes(
           editor,
           [
-            {key: 'a', mergeable: true, text: 'a'},
-            {key: 'empty', mergeable: true, text: ''},
-            {key: 'b', mergeable: true, text: 'b'},
-            {key: 'c', mergeable: true, text: 'c'},
+            {
+              key: 'a',
+              mergeable: true,
+              text: 'a',
+            },
+            {
+              key: 'empty',
+              mergeable: true,
+              text: '',
+            },
+            {
+              key: 'b',
+              mergeable: true,
+              text: 'b',
+            },
+            {
+              key: 'c',
+              mergeable: true,
+              text: 'c',
+            },
           ],
           true,
         );
@@ -311,7 +347,6 @@ describe('LexicalSelectionHelpers tests', () => {
         );
       });
     });
-
     test('Has correct text point adjust to element point after removal of a single empty text node', async () => {
       const editor = createTestEditor();
       const domElement = document.createElement('div');
@@ -323,7 +358,13 @@ describe('LexicalSelectionHelpers tests', () => {
         const root = $getRoot();
         element = createParagraphWithNodes(
           editor,
-          [{key: 'a', mergeable: true, text: ''}],
+          [
+            {
+              key: 'a',
+              mergeable: true,
+              text: '',
+            },
+          ],
           true,
         );
         root.append(element);
@@ -359,7 +400,6 @@ describe('LexicalSelectionHelpers tests', () => {
         );
       });
     });
-
     test('Has correct element point after removal of an empty text node in a group #1', async () => {
       const editor = createTestEditor();
       const domElement = document.createElement('div');
@@ -372,8 +412,16 @@ describe('LexicalSelectionHelpers tests', () => {
         element = createParagraphWithNodes(
           editor,
           [
-            {key: 'a', mergeable: true, text: ''},
-            {key: 'b', mergeable: false, text: 'b'},
+            {
+              key: 'a',
+              mergeable: true,
+              text: '',
+            },
+            {
+              key: 'b',
+              mergeable: false,
+              text: 'b',
+            },
           ],
           true,
         );
@@ -410,7 +458,6 @@ describe('LexicalSelectionHelpers tests', () => {
         );
       });
     });
-
     test('Has correct element point after removal of an empty text node in a group #2', async () => {
       const editor = createTestEditor();
       const domElement = document.createElement('div');
@@ -423,10 +470,26 @@ describe('LexicalSelectionHelpers tests', () => {
         element = createParagraphWithNodes(
           editor,
           [
-            {key: 'a', mergeable: true, text: ''},
-            {key: 'b', mergeable: false, text: 'b'},
-            {key: 'c', mergeable: true, text: 'c'},
-            {key: 'd', mergeable: true, text: 'd'},
+            {
+              key: 'a',
+              mergeable: true,
+              text: '',
+            },
+            {
+              key: 'b',
+              mergeable: false,
+              text: 'b',
+            },
+            {
+              key: 'c',
+              mergeable: true,
+              text: 'c',
+            },
+            {
+              key: 'd',
+              mergeable: true,
+              text: 'd',
+            },
           ],
           true,
         );
@@ -463,7 +526,6 @@ describe('LexicalSelectionHelpers tests', () => {
         );
       });
     });
-
     test('Has correct text point after removal of an empty text node in a group #3', async () => {
       const editor = createTestEditor();
       const domElement = document.createElement('div');
@@ -476,10 +538,26 @@ describe('LexicalSelectionHelpers tests', () => {
         element = createParagraphWithNodes(
           editor,
           [
-            {key: 'a', mergeable: true, text: ''},
-            {key: 'b', mergeable: false, text: 'b'},
-            {key: 'c', mergeable: true, text: 'c'},
-            {key: 'd', mergeable: true, text: 'd'},
+            {
+              key: 'a',
+              mergeable: true,
+              text: '',
+            },
+            {
+              key: 'b',
+              mergeable: false,
+              text: 'b',
+            },
+            {
+              key: 'c',
+              mergeable: true,
+              text: 'c',
+            },
+            {
+              key: 'd',
+              mergeable: true,
+              text: 'd',
+            },
           ],
           true,
         );
@@ -516,10 +594,10 @@ describe('LexicalSelectionHelpers tests', () => {
         );
       });
     });
-
     test('Can handle an element point on empty element', () => {
       const setupTestCase = (cb) => {
         const editor = createTestEditor();
+
         editor.update(() => {
           const root = $getRoot();
           const element = createParagraphWithNodes(editor, []);
@@ -534,7 +612,6 @@ describe('LexicalSelectionHelpers tests', () => {
             offset: 0,
             type: 'element',
           });
-
           const selection = $getSelection();
           cb(selection, element);
         });
@@ -544,12 +621,10 @@ describe('LexicalSelectionHelpers tests', () => {
       setupTestCase((selection, element) => {
         expect(selection.getNodes()).toEqual([element]);
       });
-
       // getTextContent
       setupTestCase((selection) => {
         expect(selection.getTextContent()).toEqual('');
       });
-
       // insertText
       setupTestCase((selection, element) => {
         selection.insertText('Test');
@@ -570,7 +645,6 @@ describe('LexicalSelectionHelpers tests', () => {
           }),
         );
       });
-
       // insertParagraph
       setupTestCase((selection, element) => {
         selection.insertParagraph();
@@ -590,7 +664,6 @@ describe('LexicalSelectionHelpers tests', () => {
           }),
         );
       });
-
       // insertLineBreak
       setupTestCase((selection, element) => {
         selection.insertLineBreak(true);
@@ -609,7 +682,6 @@ describe('LexicalSelectionHelpers tests', () => {
           }),
         );
       });
-
       // Format text
       setupTestCase((selection, element) => {
         selection.formatText('bold');
@@ -631,12 +703,10 @@ describe('LexicalSelectionHelpers tests', () => {
           }),
         );
       });
-
       // Extract selection
       setupTestCase((selection, element) => {
         expect(selection.extract()).toEqual([element]);
       });
-
       // cloneContents
       setupTestCase((selection, element) => {
         expect($cloneContents(selection)).toEqual({
@@ -645,16 +715,28 @@ describe('LexicalSelectionHelpers tests', () => {
         });
       });
     });
-
     test('Can handle a start element point', () => {
       const setupTestCase = (cb) => {
         const editor = createTestEditor();
+
         editor.update(() => {
           const root = $getRoot();
           const element = createParagraphWithNodes(editor, [
-            {key: 'a', mergeable: false, text: 'a'},
-            {key: 'b', mergeable: false, text: 'b'},
-            {key: 'c', mergeable: false, text: 'c'},
+            {
+              key: 'a',
+              mergeable: false,
+              text: 'a',
+            },
+            {
+              key: 'b',
+              mergeable: false,
+              text: 'b',
+            },
+            {
+              key: 'c',
+              mergeable: false,
+              text: 'c',
+            },
           ]);
           root.append(element);
           setAnchorPoint({
@@ -667,7 +749,6 @@ describe('LexicalSelectionHelpers tests', () => {
             offset: 0,
             type: 'element',
           });
-
           const selection = $getSelection();
           cb(selection, element);
         });
@@ -677,12 +758,10 @@ describe('LexicalSelectionHelpers tests', () => {
       setupTestCase((selection, state) => {
         expect(selection.getNodes()).toEqual([$getNodeByKey('a')]);
       });
-
       // getTextContent
       setupTestCase((selection) => {
         expect(selection.getTextContent()).toEqual('');
       });
-
       // insertText
       setupTestCase((selection, element) => {
         selection.insertText('Test');
@@ -703,7 +782,6 @@ describe('LexicalSelectionHelpers tests', () => {
           }),
         );
       });
-
       // insertParagraph
       setupTestCase((selection, element) => {
         selection.insertParagraph();
@@ -723,7 +801,6 @@ describe('LexicalSelectionHelpers tests', () => {
           }),
         );
       });
-
       // insertLineBreak
       setupTestCase((selection, element) => {
         selection.insertLineBreak(true);
@@ -742,7 +819,6 @@ describe('LexicalSelectionHelpers tests', () => {
           }),
         );
       });
-
       // Format text
       setupTestCase((selection, element) => {
         selection.formatText('bold');
@@ -764,12 +840,10 @@ describe('LexicalSelectionHelpers tests', () => {
           }),
         );
       });
-
       // Extract selection
       setupTestCase((selection, element) => {
         expect(selection.extract()).toEqual([$getNodeByKey('a')]);
       });
-
       // cloneContents
       setupTestCase((selection, element) => {
         expect($cloneContents(selection)).toEqual({
@@ -781,16 +855,28 @@ describe('LexicalSelectionHelpers tests', () => {
         });
       });
     });
-
     test('Can handle an end element point', () => {
       const setupTestCase = (cb) => {
         const editor = createTestEditor();
+
         editor.update(() => {
           const root = $getRoot();
           const element = createParagraphWithNodes(editor, [
-            {key: 'a', mergeable: false, text: 'a'},
-            {key: 'b', mergeable: false, text: 'b'},
-            {key: 'c', mergeable: false, text: 'c'},
+            {
+              key: 'a',
+              mergeable: false,
+              text: 'a',
+            },
+            {
+              key: 'b',
+              mergeable: false,
+              text: 'b',
+            },
+            {
+              key: 'c',
+              mergeable: false,
+              text: 'c',
+            },
           ]);
           root.append(element);
           setAnchorPoint({
@@ -803,7 +889,6 @@ describe('LexicalSelectionHelpers tests', () => {
             offset: 3,
             type: 'element',
           });
-
           const selection = $getSelection();
           cb(selection, element);
         });
@@ -813,12 +898,10 @@ describe('LexicalSelectionHelpers tests', () => {
       setupTestCase((selection, state) => {
         expect(selection.getNodes()).toEqual([$getNodeByKey('c')]);
       });
-
       // getTextContent
       setupTestCase((selection) => {
         expect(selection.getTextContent()).toEqual('');
       });
-
       // insertText
       setupTestCase((selection, element) => {
         selection.insertText('Test');
@@ -839,7 +922,6 @@ describe('LexicalSelectionHelpers tests', () => {
           }),
         );
       });
-
       // insertParagraph
       setupTestCase((selection, element) => {
         selection.insertParagraph();
@@ -859,7 +941,6 @@ describe('LexicalSelectionHelpers tests', () => {
           }),
         );
       });
-
       // insertLineBreak
       setupTestCase((selection, element) => {
         selection.insertLineBreak(true);
@@ -879,7 +960,6 @@ describe('LexicalSelectionHelpers tests', () => {
           }),
         );
       });
-
       // Format text
       setupTestCase((selection, element) => {
         selection.formatText('bold');
@@ -901,12 +981,10 @@ describe('LexicalSelectionHelpers tests', () => {
           }),
         );
       });
-
       // Extract selection
       setupTestCase((selection, element) => {
         expect(selection.extract()).toEqual([$getNodeByKey('c')]);
       });
-
       // cloneContents
       setupTestCase((selection, element) => {
         expect($cloneContents(selection)).toEqual({
@@ -918,7 +996,6 @@ describe('LexicalSelectionHelpers tests', () => {
         });
       });
     });
-
     test('Has correct element point after merge from middle', async () => {
       const editor = createTestEditor();
       const domElement = document.createElement('div');
@@ -929,9 +1006,21 @@ describe('LexicalSelectionHelpers tests', () => {
       editor.update(() => {
         const root = $getRoot();
         element = createParagraphWithNodes(editor, [
-          {key: 'a', mergeable: true, text: 'a'},
-          {key: 'b', mergeable: true, text: 'b'},
-          {key: 'c', mergeable: true, text: 'c'},
+          {
+            key: 'a',
+            mergeable: true,
+            text: 'a',
+          },
+          {
+            key: 'b',
+            mergeable: true,
+            text: 'b',
+          },
+          {
+            key: 'c',
+            mergeable: true,
+            text: 'c',
+          },
         ]);
         root.append(element);
         setAnchorPoint({
@@ -966,7 +1055,6 @@ describe('LexicalSelectionHelpers tests', () => {
         );
       });
     });
-
     test('Has correct element point after merge from end', async () => {
       const editor = createTestEditor();
       const domElement = document.createElement('div');
@@ -977,9 +1065,21 @@ describe('LexicalSelectionHelpers tests', () => {
       editor.update(() => {
         const root = $getRoot();
         element = createParagraphWithNodes(editor, [
-          {key: 'a', mergeable: true, text: 'a'},
-          {key: 'b', mergeable: true, text: 'b'},
-          {key: 'c', mergeable: true, text: 'c'},
+          {
+            key: 'a',
+            mergeable: true,
+            text: 'a',
+          },
+          {
+            key: 'b',
+            mergeable: true,
+            text: 'b',
+          },
+          {
+            key: 'c',
+            mergeable: true,
+            text: 'c',
+          },
         ]);
         root.append(element);
         setAnchorPoint({
@@ -1015,17 +1115,29 @@ describe('LexicalSelectionHelpers tests', () => {
       });
     });
   });
-
   describe('Simple range', () => {
     test('Can handle multiple text points', () => {
       const setupTestCase = (cb) => {
         const editor = createTestEditor();
+
         editor.update(() => {
           const root = $getRoot();
           const element = createParagraphWithNodes(editor, [
-            {key: 'a', mergeable: false, text: 'a'},
-            {key: 'b', mergeable: false, text: 'b'},
-            {key: 'c', mergeable: false, text: 'c'},
+            {
+              key: 'a',
+              mergeable: false,
+              text: 'a',
+            },
+            {
+              key: 'b',
+              mergeable: false,
+              text: 'b',
+            },
+            {
+              key: 'c',
+              mergeable: false,
+              text: 'c',
+            },
           ]);
           root.append(element);
           setAnchorPoint({
@@ -1038,7 +1150,6 @@ describe('LexicalSelectionHelpers tests', () => {
             offset: 0,
             type: 'text',
           });
-
           const selection = $getSelection();
           cb(selection, element);
         });
@@ -1051,12 +1162,10 @@ describe('LexicalSelectionHelpers tests', () => {
           $getNodeByKey('b'),
         ]);
       });
-
       // getTextContent
       setupTestCase((selection) => {
         expect(selection.getTextContent()).toEqual('a');
       });
-
       // insertText
       setupTestCase((selection, state) => {
         selection.insertText('Test');
@@ -1076,7 +1185,6 @@ describe('LexicalSelectionHelpers tests', () => {
           }),
         );
       });
-
       // insertNodes
       setupTestCase((selection, element) => {
         selection.insertNodes([$createTextNode('foo')]);
@@ -1095,7 +1203,6 @@ describe('LexicalSelectionHelpers tests', () => {
           }),
         );
       });
-
       // insertParagraph
       setupTestCase((selection) => {
         selection.insertParagraph();
@@ -1114,7 +1221,6 @@ describe('LexicalSelectionHelpers tests', () => {
           }),
         );
       });
-
       // insertLineBreak
       setupTestCase((selection, element) => {
         selection.insertLineBreak(true);
@@ -1133,7 +1239,6 @@ describe('LexicalSelectionHelpers tests', () => {
           }),
         );
       });
-
       // Format text
       setupTestCase((selection, element) => {
         selection.formatText('bold');
@@ -1154,12 +1259,10 @@ describe('LexicalSelectionHelpers tests', () => {
           }),
         );
       });
-
       // Extract selection
       setupTestCase((selection, state) => {
         expect(selection.extract()).toEqual([{...$getNodeByKey('a')}]);
       });
-
       // cloneContents
       setupTestCase((selection, element) => {
         expect($cloneContents(selection)).toEqual({
@@ -1172,16 +1275,28 @@ describe('LexicalSelectionHelpers tests', () => {
         });
       });
     });
-
     test('Can handle multiple element points', () => {
       const setupTestCase = (cb) => {
         const editor = createTestEditor();
+
         editor.update(() => {
           const root = $getRoot();
           const element = createParagraphWithNodes(editor, [
-            {key: 'a', mergeable: false, text: 'a'},
-            {key: 'b', mergeable: false, text: 'b'},
-            {key: 'c', mergeable: false, text: 'c'},
+            {
+              key: 'a',
+              mergeable: false,
+              text: 'a',
+            },
+            {
+              key: 'b',
+              mergeable: false,
+              text: 'b',
+            },
+            {
+              key: 'c',
+              mergeable: false,
+              text: 'c',
+            },
           ]);
           root.append(element);
           setAnchorPoint({
@@ -1194,7 +1309,6 @@ describe('LexicalSelectionHelpers tests', () => {
             offset: 1,
             type: 'element',
           });
-
           const selection = $getSelection();
           cb(selection, element);
         });
@@ -1207,12 +1321,10 @@ describe('LexicalSelectionHelpers tests', () => {
           $getNodeByKey('b'),
         ]);
       });
-
       // getTextContent
       setupTestCase((selection) => {
         expect(selection.getTextContent()).toEqual('a');
       });
-
       // insertText
       setupTestCase((selection, element) => {
         selection.insertText('Test');
@@ -1233,7 +1345,6 @@ describe('LexicalSelectionHelpers tests', () => {
           }),
         );
       });
-
       // insertParagraph
       setupTestCase((selection, element) => {
         selection.insertParagraph();
@@ -1253,7 +1364,6 @@ describe('LexicalSelectionHelpers tests', () => {
           }),
         );
       });
-
       // insertLineBreak
       setupTestCase((selection, element) => {
         selection.insertLineBreak(true);
@@ -1272,7 +1382,6 @@ describe('LexicalSelectionHelpers tests', () => {
           }),
         );
       });
-
       // Format text
       setupTestCase((selection, element) => {
         selection.formatText('bold');
@@ -1294,13 +1403,11 @@ describe('LexicalSelectionHelpers tests', () => {
           }),
         );
       });
-
       // Extract selection
       setupTestCase((selection, element) => {
         const firstChild = element.getFirstChild();
         expect(selection.extract()).toEqual([firstChild]);
       });
-
       // cloneContents
       setupTestCase((selection, element) => {
         expect($cloneContents(selection)).toEqual({
@@ -1313,7 +1420,6 @@ describe('LexicalSelectionHelpers tests', () => {
         });
       });
     });
-
     test('Can handle a mix of text and element points', () => {
       const setupTestCase = (cb) => {
         const editor = createTestEditor();
@@ -1321,9 +1427,21 @@ describe('LexicalSelectionHelpers tests', () => {
         editor.update(() => {
           const root = $getRoot();
           const element = createParagraphWithNodes(editor, [
-            {key: 'a', mergeable: false, text: 'a'},
-            {key: 'b', mergeable: false, text: 'b'},
-            {key: 'c', mergeable: false, text: 'c'},
+            {
+              key: 'a',
+              mergeable: false,
+              text: 'a',
+            },
+            {
+              key: 'b',
+              mergeable: false,
+              text: 'b',
+            },
+            {
+              key: 'c',
+              mergeable: false,
+              text: 'c',
+            },
           ]);
           root.append(element);
           setAnchorPoint({
@@ -1336,7 +1454,6 @@ describe('LexicalSelectionHelpers tests', () => {
             offset: 1,
             type: 'text',
           });
-
           const selection = $getSelection();
           cb(selection, element);
         });
@@ -1346,7 +1463,6 @@ describe('LexicalSelectionHelpers tests', () => {
       setupTestCase((selection, state) => {
         expect(selection.anchor.isBefore(selection.focus)).toEqual(true);
       });
-
       // getNodes
       setupTestCase((selection, state) => {
         expect(selection.getNodes()).toEqual([
@@ -1355,12 +1471,10 @@ describe('LexicalSelectionHelpers tests', () => {
           $getNodeByKey('c'),
         ]);
       });
-
       // getTextContent
       setupTestCase((selection) => {
         expect(selection.getTextContent()).toEqual('abc');
       });
-
       // insertText
       setupTestCase((selection, element) => {
         selection.insertText('Test');
@@ -1381,7 +1495,6 @@ describe('LexicalSelectionHelpers tests', () => {
           }),
         );
       });
-
       // insertParagraph
       setupTestCase((selection, element) => {
         selection.insertParagraph();
@@ -1401,7 +1514,6 @@ describe('LexicalSelectionHelpers tests', () => {
           }),
         );
       });
-
       // insertLineBreak
       setupTestCase((selection, element) => {
         selection.insertLineBreak(true);
@@ -1420,7 +1532,6 @@ describe('LexicalSelectionHelpers tests', () => {
           }),
         );
       });
-
       // Format text
       setupTestCase((selection, element) => {
         selection.formatText('bold');
@@ -1442,7 +1553,6 @@ describe('LexicalSelectionHelpers tests', () => {
           }),
         );
       });
-
       // Extract selection
       setupTestCase((selection, element) => {
         expect(selection.extract()).toEqual([
@@ -1451,7 +1561,6 @@ describe('LexicalSelectionHelpers tests', () => {
           $getNodeByKey('c'),
         ]);
       });
-
       // cloneContents
       setupTestCase((selection, element) => {
         expect($cloneContents(selection)).toEqual({
@@ -1466,10 +1575,10 @@ describe('LexicalSelectionHelpers tests', () => {
       });
     });
   });
-
   test('range with multiple paragraphs', async () => {
     const editor = createTestEditor();
     const element = document.createElement('div');
+
     editor.setRootElement(element);
 
     await editor.update((state: State) => {
@@ -1484,7 +1593,6 @@ describe('LexicalSelectionHelpers tests', () => {
       paragraph1.append(text1);
       paragraph2.append(text2);
       paragraph3.append(text3);
-
       text1.select(0, 0);
       const selection1 = $getSelection();
       selection1.focus.set(text3.getKey(), 1, 'text');
@@ -1503,7 +1611,6 @@ describe('LexicalSelectionHelpers tests', () => {
       expect(selectedNodes1.nodeMap[5][0]).toEqual(text3.getKey());
       expect(selectedNodes1.nodeMap[5][1].__text).toBe('T');
       expect(() => selectedNodes1.nodeMap[5][1].getTextContent()).toThrow();
-
       text1.select(1, 1);
       const selection2 = $getSelection();
       selection2.focus.set(text3.getKey(), 4, 'text');
@@ -1523,33 +1630,29 @@ describe('LexicalSelectionHelpers tests', () => {
       expect(selectedNodes2.nodeMap[5][1].__text).toBe('Thir');
     });
   });
-
   test('range with excludeFromCopy nodes', async () => {
     const editor = createTestEditor();
     const element = document.createElement('div');
+
     editor.setRootElement(element);
 
     await editor.update((state: State) => {
       const root = $getRoot();
       const paragraph = $createParagraphNode();
       root.append(paragraph);
-
       const excludeElementNode1 = $createTestExcludeFromCopyElementNode();
       paragraph.append(excludeElementNode1);
       paragraph.select(0, 0);
       const selectedNodes1 = $cloneContents($getSelection());
       expect(selectedNodes1.range).toEqual([]);
-
       const text1 = $createTextNode('1');
       excludeElementNode1.append(text1);
       excludeElementNode1.select(0, 0);
       const selectedNodes2 = $cloneContents($getSelection());
       expect(selectedNodes2.range).toEqual([paragraph.getKey()]);
-
       paragraph.select(0, 0);
       const selectedNodes3 = $cloneContents($getSelection());
       expect(selectedNodes3.range).toEqual([paragraph.getKey()]);
-
       const text2 = $createTextNode('2');
       excludeElementNode1.insertAfter(text2);
       paragraph.select(0, 2);
@@ -1558,7 +1661,6 @@ describe('LexicalSelectionHelpers tests', () => {
       expect(selectedNodes4.nodeMap[0][0]).toEqual(text1.getKey());
       expect(selectedNodes4.nodeMap[1][0]).toEqual(paragraph.getKey());
       expect(selectedNodes4.nodeMap[2][0]).toEqual(text2.getKey());
-
       const text3 = $createTextNode('3');
       excludeElementNode1.append(text3);
       paragraph.select(0, 2);
@@ -1568,7 +1670,6 @@ describe('LexicalSelectionHelpers tests', () => {
       expect(selectedNodes5.nodeMap[1][0]).toEqual(paragraph.getKey());
       expect(selectedNodes5.nodeMap[2][0]).toEqual(text3.getKey());
       expect(selectedNodes5.nodeMap[3][0]).toEqual(text2.getKey());
-
       const testElementNode = $createTestElementNode();
       const excludeElementNode2 = $createTestExcludeFromCopyElementNode();
       const text4 = $createTextNode('4');
@@ -1584,7 +1685,6 @@ describe('LexicalSelectionHelpers tests', () => {
       expect(selectedNodes6.nodeMap[3][0]).toEqual(text1.getKey());
       expect(selectedNodes6.nodeMap[4][0]).toEqual(text3.getKey());
       expect(selectedNodes6.nodeMap[5][0]).toEqual(text2.getKey());
-
       text4.remove();
       paragraph.select(0, 3);
       const selectedNodes7 = $cloneContents($getSelection());
@@ -1596,19 +1696,18 @@ describe('LexicalSelectionHelpers tests', () => {
       expect(selectedNodes7.nodeMap[4][0]).toEqual(text2.getKey());
     });
   });
-
   describe('can insert non-element nodes correctly', () => {
     describe('with an empty paragraph node selected', () => {
       test('a single text node', async () => {
         const editor = createTestEditor();
         const element = document.createElement('div');
+
         editor.setRootElement(element);
 
         await editor.update((state: State) => {
           const root = $getRoot();
           const paragraph = $createParagraphNode();
           root.append(paragraph);
-
           setAnchorPoint({
             key: paragraph.getKey(),
             offset: 0,
@@ -1620,25 +1719,22 @@ describe('LexicalSelectionHelpers tests', () => {
             type: 'element',
           });
           const selection = $getSelection();
-
           selection.insertNodes([$createTextNode('foo')]);
         });
-
         expect(element.innerHTML).toBe(
           '<p dir="ltr"><span data-lexical-text="true">foo</span></p>',
         );
       });
-
       test('two text nodes', async () => {
         const editor = createTestEditor();
         const element = document.createElement('div');
+
         editor.setRootElement(element);
 
         await editor.update((state: State) => {
           const root = $getRoot();
           const paragraph = $createParagraphNode();
           root.append(paragraph);
-
           setAnchorPoint({
             key: paragraph.getKey(),
             offset: 0,
@@ -1650,28 +1746,25 @@ describe('LexicalSelectionHelpers tests', () => {
             type: 'element',
           });
           const selection = $getSelection();
-
           selection.insertNodes([
             $createTextNode('foo'),
             $createTextNode('bar'),
           ]);
         });
-
         expect(element.innerHTML).toBe(
           '<p dir="ltr"><span data-lexical-text="true">foobar</span></p>',
         );
       });
-
       test('link insertion without parent element', async () => {
         const editor = createTestEditor();
         const element = document.createElement('div');
+
         editor.setRootElement(element);
 
         await editor.update((state: State) => {
           const root = $getRoot();
           const paragraph = $createParagraphNode();
           root.append(paragraph);
-
           setAnchorPoint({
             key: paragraph.getKey(),
             offset: 0,
@@ -1683,32 +1776,28 @@ describe('LexicalSelectionHelpers tests', () => {
             type: 'element',
           });
           const selection = $getSelection();
-
           const link = $createLinkNode('https://');
           link.append($createTextNode('ello worl'));
-
           selection.insertNodes([
             $createTextNode('h'),
             link,
             $createTextNode('d'),
           ]);
         });
-
         expect(element.innerHTML).toBe(
           '<p dir="ltr"><span data-lexical-text="true">h</span><a href="https://" dir="ltr"><span data-lexical-text="true">ello worl</span></a><span data-lexical-text="true">d</span></p>',
         );
       });
-
       test('a single heading node with a child text node', async () => {
         const editor = createTestEditor();
         const element = document.createElement('div');
+
         editor.setRootElement(element);
 
         await editor.update((state: State) => {
           const root = $getRoot();
           const paragraph = $createParagraphNode();
           root.append(paragraph);
-
           setAnchorPoint({
             key: paragraph.getKey(),
             offset: 0,
@@ -1723,25 +1812,22 @@ describe('LexicalSelectionHelpers tests', () => {
           const heading = $createHeadingNode('h1');
           const child = $createTextNode('foo');
           heading.append(child);
-
           selection.insertNodes([heading]);
         });
-
         expect(element.innerHTML).toBe(
           '<h1 dir="ltr"><span data-lexical-text="true">foo</span></h1>',
         );
       });
-
       test('a heading node with a child text node and a disjoint sibling text node should throw', async () => {
         const editor = createTestEditor();
         const element = document.createElement('div');
+
         editor.setRootElement(element);
 
         await editor.update((state: State) => {
           const root = $getRoot();
           const paragraph = $createParagraphNode();
           root.append(paragraph);
-
           setAnchorPoint({
             key: paragraph.getKey(),
             offset: 0,
@@ -1756,22 +1842,20 @@ describe('LexicalSelectionHelpers tests', () => {
           const heading = $createHeadingNode('h1');
           const child = $createTextNode('foo');
           heading.append(child);
-
           expect(() => {
             selection.insertNodes([heading, $createTextNode('bar')]);
           }).toThrow();
         });
-
         expect(element.innerHTML).toBe(
           '<h1 dir="ltr"><span data-lexical-text="true">foo</span></h1>',
         );
       });
     });
-
     describe('with a paragraph node selected on some existing text', () => {
       test('a single text node', async () => {
         const editor = createTestEditor();
         const element = document.createElement('div');
+
         editor.setRootElement(element);
 
         await editor.update((state: State) => {
@@ -1780,7 +1864,6 @@ describe('LexicalSelectionHelpers tests', () => {
           const text = $createTextNode('Existing text...');
           paragraph.append(text);
           root.append(paragraph);
-
           setAnchorPoint({
             key: text.getKey(),
             offset: 16,
@@ -1792,18 +1875,16 @@ describe('LexicalSelectionHelpers tests', () => {
             type: 'text',
           });
           const selection = $getSelection();
-
           selection.insertNodes([$createTextNode('foo')]);
         });
-
         expect(element.innerHTML).toBe(
           '<p dir="ltr"><span data-lexical-text="true">Existing text...foo</span></p>',
         );
       });
-
       test('two text nodes', async () => {
         const editor = createTestEditor();
         const element = document.createElement('div');
+
         editor.setRootElement(element);
 
         await editor.update((state: State) => {
@@ -1812,7 +1893,6 @@ describe('LexicalSelectionHelpers tests', () => {
           const text = $createTextNode('Existing text...');
           paragraph.append(text);
           root.append(paragraph);
-
           setAnchorPoint({
             key: text.getKey(),
             offset: 16,
@@ -1824,21 +1904,19 @@ describe('LexicalSelectionHelpers tests', () => {
             type: 'text',
           });
           const selection = $getSelection();
-
           selection.insertNodes([
             $createTextNode('foo'),
             $createTextNode('bar'),
           ]);
         });
-
         expect(element.innerHTML).toBe(
           '<p dir="ltr"><span data-lexical-text="true">Existing text...foobar</span></p>',
         );
       });
-
       test('a single heading node with a child text node', async () => {
         const editor = createTestEditor();
         const element = document.createElement('div');
+
         editor.setRootElement(element);
 
         await editor.update((state: State) => {
@@ -1847,7 +1925,6 @@ describe('LexicalSelectionHelpers tests', () => {
           const text = $createTextNode('Existing text...');
           paragraph.append(text);
           root.append(paragraph);
-
           setAnchorPoint({
             key: text.getKey(),
             offset: 16,
@@ -1862,18 +1939,16 @@ describe('LexicalSelectionHelpers tests', () => {
           const heading = $createHeadingNode('h1');
           const child = $createTextNode('foo');
           heading.append(child);
-
           selection.insertNodes([heading]);
         });
-
         expect(element.innerHTML).toBe(
           '<p dir="ltr"><span data-lexical-text="true">Existing text...foo</span></p>',
         );
       });
-
       test('a heading node with a child text node and a disjoint sibling text node should throw', async () => {
         const editor = createTestEditor();
         const element = document.createElement('div');
+
         editor.setRootElement(element);
 
         await editor.update((state: State) => {
@@ -1882,7 +1957,6 @@ describe('LexicalSelectionHelpers tests', () => {
           const text = $createTextNode('Existing text...');
           paragraph.append(text);
           root.append(paragraph);
-
           setAnchorPoint({
             key: text.getKey(),
             offset: 16,
@@ -1897,12 +1971,10 @@ describe('LexicalSelectionHelpers tests', () => {
           const heading = $createHeadingNode('h1');
           const child = $createTextNode('foo');
           heading.append(child);
-
           expect(() => {
             selection.insertNodes([heading, $createTextNode('bar')]);
           }).toThrow();
         });
-
         expect(element.innerHTML).toBe(
           '<p dir="ltr"><span data-lexical-text="true">Existing text...foo</span></p>',
         );
@@ -1910,19 +1982,19 @@ describe('LexicalSelectionHelpers tests', () => {
     });
   });
 });
-
 describe('extract', () => {
   test('', async () => {
     const editor = createTestEditor();
     const element = document.createElement('div');
+
     editor.setRootElement(element);
+
     await editor.update(() => {
       const root = $getRoot();
       const paragraph = $createParagraphNode();
       const text = $createTextNode('Existing text...');
       paragraph.append(text);
       root.append(paragraph);
-
       setAnchorPoint({
         key: text.getKey(),
         offset: 16,

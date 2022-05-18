@@ -4,8 +4,8 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- * @flow strict
  */
+
 import type {
   ElementNode,
   GridSelection,
@@ -16,15 +16,14 @@ import type {
   Point,
   RangeSelection,
 } from 'lexical';
+
 export function $cloneContents(
   selection: RangeSelection | NodeSelection | GridSelection,
 ): {
   nodeMap: Array<[NodeKey, LexicalNode]>;
   range: Array<NodeKey>;
 };
-export function $cloneWithProperties<LexicalNode>(
-  node: LexicalNode,
-): LexicalNode;
+export function $cloneWithProperties<T extends LexicalNode>(node: T): T;
 export function getStyleObjectFromCSS(css: string): {
   [key: string]: string;
 } | null;

@@ -4,7 +4,6 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- * @flow strict
  */
 
 import {CodeHighlightNode, CodeNode} from '@lexical/code';
@@ -27,33 +26,21 @@ import React from 'react';
 import {createRoot} from 'react-dom/client';
 import ReactTestUtils from 'react-dom/test-utils';
 
-// No idea why we suddenly need to do this, but it fixes the tests
-// with latest experimental React version.
-global.IS_REACT_ACT_ENVIRONMENT = true;
-
 jest.mock('shared/environment', () => {
   const originalModule = jest.requireActual('shared/environment');
-
-  return {
-    ...originalModule,
-    IS_FIREFOX: true,
-  };
+  return {...originalModule, IS_FIREFOX: true};
 });
-
 describe('LexicalEventHelpers', () => {
   let container = null;
-
   beforeEach(async () => {
     container = document.createElement('div');
     document.body.appendChild(container);
     await init();
   });
-
   afterEach(() => {
     document.body.removeChild(container);
     container = null;
   });
-
   let editor = null;
 
   async function init() {
@@ -143,7 +130,6 @@ describe('LexicalEventHelpers', () => {
       '<div contenteditable="true" style="user-select: text; white-space: pre-wrap; word-break: break-word;" data-lexical-editor="true"><p class="editor-paragraph"><br></p></div>',
     );
   });
-
   describe('onPasteForRichText', () => {
     describe('baseline', () => {
       const suite = [

@@ -5,6 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  *
  */
+
 import {Class} from 'utility-types';
 
 import type {LexicalNode, ElementNode, LexicalEditor} from 'lexical';

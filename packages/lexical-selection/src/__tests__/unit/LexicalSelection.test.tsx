@@ -18,7 +18,6 @@ import {
   $createTextNode,
   $getRoot,
   $getSelection,
-  Selection,
 } from 'lexical';
 import {
   $createTestDecoratorNode,
@@ -26,9 +25,9 @@ import {
   createTestEditor,
   TestComposer,
 } from 'lexical/src/__tests__/utils';
-import React from 'react';
+import * as React from 'react';
 import {createRoot} from 'react-dom/client';
-import ReactTestUtils from 'react-dom/test-utils';
+import * as ReactTestUtils from 'react-dom/test-utils';
 
 import {
   applySelectionInputs,
@@ -57,17 +56,9 @@ import {
   undo,
 } from '../utils';
 
-// No idea why we suddenly need to do this, but it fixes the tests
-// with latest experimental React version.
-global.IS_REACT_ACT_ENVIRONMENT = true;
-
 jest.mock('shared/environment', () => {
   const originalModule = jest.requireActual('shared/environment');
-
-  return {
-    ...originalModule,
-    IS_FIREFOX: true,
-  };
+  return {...originalModule, IS_FIREFOX: true};
 });
 
 describe('LexicalSelection tests', () => {
@@ -76,6 +67,7 @@ describe('LexicalSelection tests', () => {
   beforeEach(async () => {
     container = document.createElement('div');
     document.body.appendChild(container);
+
     await init();
   });
 
@@ -140,7 +132,9 @@ describe('LexicalSelection tests', () => {
     ReactTestUtils.act(() => {
       createRoot(container).render(<TestBase />);
     });
+
     editor.getRootElement().focus();
+
     await Promise.resolve().then();
     // Focus first element
     setNativeSelectionWithPaths(editor.getRootElement(), [0, 0], 0, [0, 0], 0);
@@ -150,6 +144,7 @@ describe('LexicalSelection tests', () => {
     await ReactTestUtils.act(async () => {
       await editor.update(fn);
     });
+
     return Promise.resolve().then();
   }
 
@@ -203,7 +198,6 @@ describe('LexicalSelection tests', () => {
       grapheme: '\uD83D\uDC4F\uD83C\uDFFD',
     },
   ];
-
   const suite = [
     {
       expectedHTML:
@@ -429,9 +423,7 @@ describe('LexicalSelection tests', () => {
         convertToSegmentedNode(),
       ],
       name: 'Convert text to a segmented node',
-    },
-    // Tests need fixing:
-
+    }, // Tests need fixing:
     // ...GRAPHEME_SCENARIOS.flatMap(({description, grapheme}) => [
     //   {
     //     name: `Delete backward eliminates entire ${description} (${grapheme})`,
@@ -727,19 +719,58 @@ describe('LexicalSelection tests', () => {
     //   },
     // },
     ...[
-      {whitespaceCharacter: ' ', whitespaceName: 'space'},
-      {whitespaceCharacter: '\u00a0', whitespaceName: 'non-breaking space'},
-      {whitespaceCharacter: '\u2000', whitespaceName: 'en quad'},
-      {whitespaceCharacter: '\u2001', whitespaceName: 'em quad'},
-      {whitespaceCharacter: '\u2002', whitespaceName: 'en space'},
-      {whitespaceCharacter: '\u2003', whitespaceName: 'em space'},
-      {whitespaceCharacter: '\u2004', whitespaceName: 'three-per-em space'},
-      {whitespaceCharacter: '\u2005', whitespaceName: 'four-per-em space'},
-      {whitespaceCharacter: '\u2006', whitespaceName: 'six-per-em space'},
-      {whitespaceCharacter: '\u2007', whitespaceName: 'figure space'},
-      {whitespaceCharacter: '\u2008', whitespaceName: 'punctuation space'},
-      {whitespaceCharacter: '\u2009', whitespaceName: 'thin space'},
-      {whitespaceCharacter: '\u200A', whitespaceName: 'hair space'},
+      {
+        whitespaceCharacter: ' ',
+        whitespaceName: 'space',
+      },
+      {
+        whitespaceCharacter: '\u00a0',
+        whitespaceName: 'non-breaking space',
+      },
+      {
+        whitespaceCharacter: '\u2000',
+        whitespaceName: 'en quad',
+      },
+      {
+        whitespaceCharacter: '\u2001',
+        whitespaceName: 'em quad',
+      },
+      {
+        whitespaceCharacter: '\u2002',
+        whitespaceName: 'en space',
+      },
+      {
+        whitespaceCharacter: '\u2003',
+        whitespaceName: 'em space',
+      },
+      {
+        whitespaceCharacter: '\u2004',
+        whitespaceName: 'three-per-em space',
+      },
+      {
+        whitespaceCharacter: '\u2005',
+        whitespaceName: 'four-per-em space',
+      },
+      {
+        whitespaceCharacter: '\u2006',
+        whitespaceName: 'six-per-em space',
+      },
+      {
+        whitespaceCharacter: '\u2007',
+        whitespaceName: 'figure space',
+      },
+      {
+        whitespaceCharacter: '\u2008',
+        whitespaceName: 'punctuation space',
+      },
+      {
+        whitespaceCharacter: '\u2009',
+        whitespaceName: 'thin space',
+      },
+      {
+        whitespaceCharacter: '\u200A',
+        whitespaceName: 'hair space',
+      },
     ].flatMap(({whitespaceCharacter, whitespaceName}) => [
       {
         expectedHTML: `<div contenteditable="true" style="user-select: text; white-space: pre-wrap; word-break: break-word;" data-lexical-editor="true"><p class="editor-paragraph" dir="ltr"><span data-lexical-text="true">Hello${printWhitespace(
@@ -893,7 +924,6 @@ describe('LexicalSelection tests', () => {
       },
     ]),
   ];
-
   suite.forEach((testUnit, i) => {
     const name = testUnit.name || 'Test case';
     test(name + ` (#${i + 1})`, async () => {
@@ -906,7 +936,6 @@ describe('LexicalSelection tests', () => {
       assertSelection(rootElement, expectedSelection);
     });
   });
-
   test('getNodes resolves nested block nodes', async () => {
     await ReactTestUtils.act(async () => {
       await editor.update(() => {
@@ -916,7 +945,6 @@ describe('LexicalSelection tests', () => {
         const text = $createTextNode();
         paragraph.append(elementNode);
         elementNode.append(text);
-
         const selectedNodes = $getSelection().getNodes();
         expect(selectedNodes.length).toBe(1);
         expect(selectedNodes[0].getKey()).toBe(text.getKey());
@@ -932,7 +960,6 @@ describe('LexicalSelection tests', () => {
         fn: (paragraph, text) => {
           const newText = $createTextNode('2');
           text.insertBefore(newText);
-
           return {
             expectedAnchor: paragraph,
             expectedAnchorOffset: 3,
@@ -948,7 +975,6 @@ describe('LexicalSelection tests', () => {
         fn: (paragraph, text) => {
           const newText = $createTextNode('2');
           text.insertAfter(newText);
-
           return {
             expectedAnchor: paragraph,
             expectedAnchorOffset: 3,
@@ -963,7 +989,6 @@ describe('LexicalSelection tests', () => {
         anchorOffset: 2,
         fn: (paragraph, text) => {
           text.splitText(1);
-
           return {
             expectedAnchor: paragraph,
             expectedAnchorOffset: 3,
@@ -978,7 +1003,6 @@ describe('LexicalSelection tests', () => {
         anchorOffset: 1,
         fn: (paragraph, text) => {
           text.remove();
-
           return {
             expectedAnchor: paragraph,
             expectedAnchorOffset: 0,
@@ -994,7 +1018,6 @@ describe('LexicalSelection tests', () => {
         fn: (paragraph, text) => {
           const newText = $createTextNode('replacement');
           text.replace(newText);
-
           return {
             expectedAnchor: paragraph,
             expectedAnchorOffset: 1,
@@ -1004,14 +1027,12 @@ describe('LexicalSelection tests', () => {
         },
         focusOffset: 1,
         name: 'replace - Collapsed selection on end; replace beginning',
-      },
-      // All selected; add/remove/replace on beginning
+      }, // All selected; add/remove/replace on beginning
       {
         anchorOffset: 0,
         fn: (paragraph, text) => {
           const newText = $createTextNode('2');
           text.insertBefore(newText);
-
           return {
             expectedAnchor: text,
             expectedAnchorOffset: 0,
@@ -1026,7 +1047,6 @@ describe('LexicalSelection tests', () => {
         anchorOffset: 0,
         fn: (paragraph, originalText) => {
           const [, text] = originalText.splitText(1);
-
           return {
             expectedAnchor: text,
             expectedAnchorOffset: 0,
@@ -1041,7 +1061,6 @@ describe('LexicalSelection tests', () => {
         anchorOffset: 0,
         fn: (paragraph, text) => {
           text.remove();
-
           return {
             expectedAnchor: paragraph,
             expectedAnchorOffset: 0,
@@ -1057,7 +1076,6 @@ describe('LexicalSelection tests', () => {
         fn: (paragraph, text) => {
           const newText = $createTextNode('replacement');
           text.replace(newText);
-
           return {
             expectedAnchor: paragraph,
             expectedAnchorOffset: 0,
@@ -1067,8 +1085,7 @@ describe('LexicalSelection tests', () => {
         },
         focusOffset: 1,
         name: 'replace - All selected; replace on beginning',
-      },
-      // Selection beginning; add/remove/replace on end
+      }, // Selection beginning; add/remove/replace on end
       {
         anchorOffset: 0,
         fn: (paragraph, originalText1) => {
@@ -1076,7 +1093,6 @@ describe('LexicalSelection tests', () => {
           const lastChild = paragraph.getLastChild();
           const newText = $createTextNode('2');
           lastChild.insertBefore(newText);
-
           return {
             expectedAnchor: originalText2,
             expectedAnchorOffset: 0,
@@ -1097,7 +1113,6 @@ describe('LexicalSelection tests', () => {
           const lastChild = paragraph.getLastChild();
           const newText = $createTextNode('2');
           lastChild.insertAfter(newText);
-
           return {
             expectedAnchor: text,
             expectedAnchorOffset: 0,
@@ -1113,7 +1128,6 @@ describe('LexicalSelection tests', () => {
         fn: (paragraph, originalText1) => {
           const originalText2 = originalText1.getPreviousSibling();
           const [, text] = originalText1.splitText(1);
-
           return {
             expectedAnchor: originalText2,
             expectedAnchorOffset: 0,
@@ -1133,7 +1147,6 @@ describe('LexicalSelection tests', () => {
         fn: (paragraph, text) => {
           const lastChild = paragraph.getLastChild();
           lastChild.remove();
-
           return {
             expectedAnchor: text,
             expectedAnchorOffset: 0,
@@ -1150,7 +1163,6 @@ describe('LexicalSelection tests', () => {
           const newText = $createTextNode('replacement');
           const lastChild = paragraph.getLastChild();
           lastChild.replace(newText);
-
           return {
             expectedAnchor: paragraph,
             expectedAnchorOffset: 0,
@@ -1160,15 +1172,13 @@ describe('LexicalSelection tests', () => {
         },
         focusOffset: 1,
         name: 'replace - Selection beginning; replace on end',
-      },
-      // All selected; add/remove/replace in end offset [1, 2] -> [1, N, 2]
+      }, // All selected; add/remove/replace in end offset [1, 2] -> [1, N, 2]
       {
         anchorOffset: 0,
         fn: (paragraph, text) => {
           const lastChild = paragraph.getLastChild();
           const newText = $createTextNode('2');
           lastChild.insertBefore(newText);
-
           return {
             expectedAnchor: text,
             expectedAnchorOffset: 0,
@@ -1184,7 +1194,6 @@ describe('LexicalSelection tests', () => {
         fn: (paragraph, text) => {
           const newText = $createTextNode('2');
           text.insertAfter(newText);
-
           return {
             expectedAnchor: text,
             expectedAnchorOffset: 0,
@@ -1200,7 +1209,6 @@ describe('LexicalSelection tests', () => {
         fn: (paragraph, originalText1) => {
           const originalText2 = originalText1.getPreviousSibling();
           const [, text] = originalText1.splitText(1);
-
           return {
             expectedAnchor: originalText2,
             expectedAnchorOffset: 0,
@@ -1220,7 +1228,6 @@ describe('LexicalSelection tests', () => {
         fn: (paragraph, originalText1) => {
           const lastChild = paragraph.getLastChild();
           lastChild.remove();
-
           return {
             expectedAnchor: originalText1,
             expectedAnchorOffset: 0,
@@ -1241,7 +1248,6 @@ describe('LexicalSelection tests', () => {
           const newText = $createTextNode('replacement');
           const lastChild = paragraph.getLastChild();
           lastChild.replace(newText);
-
           return {
             expectedAnchor: paragraph,
             expectedAnchorOffset: 1,
@@ -1255,8 +1261,7 @@ describe('LexicalSelection tests', () => {
         },
         focusOffset: 2,
         name: 'replace - All selected; replace in end offset',
-      },
-      // All selected; add/remove/replace in middle [1, 2, 3] -> [1, 2, N, 3]
+      }, // All selected; add/remove/replace in middle [1, 2, 3] -> [1, 2, N, 3]
       {
         anchorOffset: 0,
         fn: (paragraph, originalText1) => {
@@ -1264,7 +1269,6 @@ describe('LexicalSelection tests', () => {
           const lastChild = paragraph.getLastChild();
           const newText = $createTextNode('2');
           lastChild.insertBefore(newText);
-
           return {
             expectedAnchor: originalText2,
             expectedAnchorOffset: 0,
@@ -1285,7 +1289,6 @@ describe('LexicalSelection tests', () => {
           const originalText2 = originalText1.getPreviousSibling();
           const newText = $createTextNode('2');
           originalText1.insertAfter(newText);
-
           return {
             expectedAnchor: originalText2,
             expectedAnchorOffset: 0,
@@ -1305,7 +1308,6 @@ describe('LexicalSelection tests', () => {
         fn: (paragraph, originalText1) => {
           const originalText2 = originalText1.getPreviousSibling();
           originalText1.splitText(1);
-
           return {
             expectedAnchor: originalText2,
             expectedAnchorOffset: 0,
@@ -1325,7 +1327,6 @@ describe('LexicalSelection tests', () => {
         fn: (paragraph, originalText1) => {
           const originalText2 = originalText1.getPreviousSibling();
           originalText1.remove();
-
           return {
             expectedAnchor: originalText2,
             expectedAnchorOffset: 0,
@@ -1345,7 +1346,6 @@ describe('LexicalSelection tests', () => {
         fn: (paragraph, originalText1) => {
           const newText = $createTextNode('replacement');
           originalText1.replace(newText);
-
           return {
             expectedAnchor: paragraph,
             expectedAnchorOffset: 0,
@@ -1359,15 +1359,13 @@ describe('LexicalSelection tests', () => {
         },
         focusOffset: 2,
         name: 'replace - All selected; replace in middle',
-      },
-      // Edge cases
+      }, // Edge cases
       {
         anchorOffset: 3,
         fn: (paragraph, originalText1) => {
           const originalText2 = paragraph.getLastChild();
           const newText = $createTextNode('new');
           originalText1.insertBefore(newText);
-
           return {
             expectedAnchor: originalText2,
             expectedAnchorOffset: 'bar'.length,
@@ -1388,7 +1386,6 @@ describe('LexicalSelection tests', () => {
           const originalText2 = paragraph.getLastChild();
           const newText = $createTextNode('new');
           originalText1.insertBefore(newText);
-
           return {
             expectedAnchor: originalText1,
             expectedAnchorOffset: 0,
@@ -1435,17 +1432,13 @@ describe('LexicalSelection tests', () => {
                 const textNode = $createTextNode('foo');
                 // Note: line break can't be selected by the DOM
                 const linebreak = $createLineBreakNode();
-                const selection: Selection = $getSelection();
+                const selection = $getSelection();
                 const anchor = selection.anchor;
                 const focus = selection.focus;
-
                 paragraph.append(textNode, linebreak);
-
                 fnBefore(paragraph, textNode);
-
                 anchor.set(paragraph.getKey(), anchorOffset, 'block');
                 focus.set(paragraph.getKey(), focusOffset, 'block');
-
                 const {
                   expectedAnchor,
                   expectedAnchorOffset,
@@ -1497,7 +1490,6 @@ describe('LexicalSelection tests', () => {
       await ReactTestUtils.act(async () => {
         await editor.update(() => {
           // Arrange
-
           // Root
           //  |- Paragraph
           //    |- Link
@@ -1519,10 +1511,8 @@ describe('LexicalSelection tests', () => {
           paragraph.append(link);
           paragraph.append(textThree);
           textThree.select();
-
           // Act
           textThree.remove();
-
           // Assert
           const selection = $getSelection();
           const expectedKey = link.getKey();
@@ -1535,7 +1525,6 @@ describe('LexicalSelection tests', () => {
       });
     });
   });
-
   test('isBackward', async () => {
     await ReactTestUtils.act(async () => {
       await editor.update(() => {
@@ -1546,24 +1535,19 @@ describe('LexicalSelection tests', () => {
         const textNodeKey = textNode.getKey();
         // Note: line break can't be selected by the DOM
         const linebreak = $createLineBreakNode();
-        const selection: Selection = $getSelection();
+        const selection = $getSelection();
         const anchor = selection.anchor;
         const focus = selection.focus;
-
         paragraph.append(textNode, linebreak);
-
         anchor.set(textNodeKey, 0, 'text');
         focus.set(textNodeKey, 0, 'text');
         expect(selection.isBackward()).toBe(false);
-
         anchor.set(paragraphKey, 1, 'block');
         focus.set(paragraphKey, 1, 'block');
         expect(selection.isBackward()).toBe(false);
-
         anchor.set(paragraphKey, 0, 'block');
         focus.set(paragraphKey, 1, 'block');
         expect(selection.isBackward()).toBe(false);
-
         anchor.set(paragraphKey, 1, 'block');
         focus.set(paragraphKey, 0, 'block');
         expect(selection.isBackward()).toBe(true);
@@ -1671,10 +1655,8 @@ describe('LexicalSelection tests', () => {
         const text2 = $createTextNode('awesome');
         text2.toggleFormat('bold');
         const text3 = $createTextNode(' world');
-
         paragraph.append(text, text2, text3);
         root.append(paragraph);
-
         setAnchorPoint({
           key: text3.getKey(),
           offset: 0,
@@ -1686,15 +1668,12 @@ describe('LexicalSelection tests', () => {
           type: 'text',
         });
         const selection = $getSelection();
-
         selection.insertParagraph();
       });
-
       expect(element.innerHTML).toBe(
         '<p dir="ltr"><span data-lexical-text="true">Hello </span><strong data-lexical-text="true">awesome</strong></p><p dir="ltr"><span data-lexical-text="true"> world</span></p>',
       );
     });
-
     test('four text nodes at offset 0 on third node', async () => {
       const testEditor = createTestEditor();
       const element = document.createElement('div');
@@ -1709,10 +1688,8 @@ describe('LexicalSelection tests', () => {
         const text3 = $createTextNode('beautiful');
         const text4 = $createTextNode(' world');
         text4.toggleFormat('bold');
-
         paragraph.append(text, text2, text3, text4);
         root.append(paragraph);
-
         setAnchorPoint({
           key: text3.getKey(),
           offset: 0,
@@ -1724,17 +1701,15 @@ describe('LexicalSelection tests', () => {
           type: 'text',
         });
         const selection = $getSelection();
-
         selection.insertParagraph();
       });
-
       expect(element.innerHTML).toBe(
         '<p dir="ltr"><span data-lexical-text="true">Hello </span><strong data-lexical-text="true">awesome </strong></p><p dir="ltr"><span data-lexical-text="true">beautiful</span><strong data-lexical-text="true"> world</strong></p>',
       );
     });
-
     it('adjust offset for inline elements text formatting', async () => {
       init();
+
       await editor.update(() => {
         const root = $getRoot();
         const text1 = $createTextNode('--');
@@ -1747,7 +1722,6 @@ describe('LexicalSelection tests', () => {
             text3,
           ),
         );
-
         setAnchorPoint({
           key: text1.getKey(),
           offset: 2,
@@ -1772,6 +1746,7 @@ describe('LexicalSelection tests', () => {
       testEditor = createTestEditor();
       const element = document.createElement('div');
       testEditor.setRootElement(element);
+
       await testEditor.update(() => {
         const root = $getRoot();
         paragraph = $createParagraphNode();
@@ -1783,13 +1758,15 @@ describe('LexicalSelection tests', () => {
         root.append(paragraph);
       });
     });
-
     [
       {
         fn: () => {
           text2.select(1, 1);
           text2.replace($createTestDecoratorNode());
-          return {key: text3.__key, offset: 0};
+          return {
+            key: text3.__key,
+            offset: 0,
+          };
         },
         name: 'moves selection to to next text node if replacing with decorator',
       },
@@ -1798,7 +1775,10 @@ describe('LexicalSelection tests', () => {
           text3.replace($createTestDecoratorNode());
           text2.select(1, 1);
           text2.replace($createTestDecoratorNode());
-          return {key: paragraph.__key, offset: 2};
+          return {
+            key: paragraph.__key,
+            offset: 2,
+          };
         },
         name: 'moves selection to parent if next sibling is not a text node',
       },

@@ -1,12 +1,11 @@
-/* eslint-disable sort-keys-fix/sort-keys-fix */
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- * @flow strict
  */
+
 import type {
   DOMConversionMap,
   DOMConversionOutput,
@@ -26,17 +25,18 @@ import {
 } from 'lexical';
 
 export const TableCellHeaderStates = {
+  BOTH: 3,
+  COLUMN: 2,
   NO_STATUS: 0,
   ROW: 1,
-  COLUMN: 2,
-  BOTH: 3,
 };
 
-export type TableCellHeaderState = $Values<typeof TableCellHeaderStates>;
+export type TableCellHeaderState =
+  typeof TableCellHeaderStates[keyof typeof TableCellHeaderStates];
 
 export class TableCellNode extends GridCellNode {
   __headerState: TableCellHeaderState;
-  __width: ?number;
+  __width: number;
 
   static getType(): 'tablecell' {
     return 'tablecell';
@@ -65,11 +65,11 @@ export class TableCellNode extends GridCellNode {
   }
 
   constructor(
-    headerState?: TableCellHeaderState = TableCellHeaderStates.NO_STATUS,
-    colSpan?: number = 1,
-    width?: ?number,
+    headerState = TableCellHeaderStates.NO_STATUS,
+    colSpan = 1,
+    width?: number,
     key?: NodeKey,
-  ): void {
+  ) {
     super(colSpan, key);
     this.__headerState = headerState;
     this.__width = width;
@@ -120,35 +120,33 @@ export class TableCellNode extends GridCellNode {
   }
 
   setHeaderStyles(headerState: TableCellHeaderState): TableCellHeaderState {
-    const self = this.getWritable();
+    const self = this.getWritable<TableCellNode>();
     self.__headerState = headerState;
     return this.__headerState;
   }
 
   getHeaderStyles(): TableCellHeaderState {
-    return this.getLatest().__headerState;
+    return this.getLatest<TableCellNode>().__headerState;
   }
 
-  setWidth(width: number): ?number {
-    const self = this.getWritable();
+  setWidth(width: number): number {
+    const self = this.getWritable<TableCellNode>();
     self.__width = width;
     return this.__width;
   }
 
-  getWidth(): ?number {
-    return this.getLatest().__width;
+  getWidth(): number {
+    return this.getLatest<TableCellNode>().__width;
   }
 
   toggleHeaderStyle(headerStateToToggle: TableCellHeaderState): TableCellNode {
-    const self = this.getWritable();
+    const self = this.getWritable<TableCellNode>();
 
     if ((self.__headerState & headerStateToToggle) === headerStateToToggle) {
       self.__headerState -= headerStateToToggle;
     } else {
       self.__headerState += headerStateToToggle;
     }
-
-    self.__headerState = self.__headerState;
 
     return self;
   }
@@ -158,7 +156,10 @@ export class TableCellNode extends GridCellNode {
   }
 
   hasHeader(): boolean {
-    return this.getLatest().__headerState !== TableCellHeaderStates.NO_STATUS;
+    return (
+      this.getLatest<TableCellNode>().__headerState !==
+      TableCellHeaderStates.NO_STATUS
+    );
   }
 
   updateDOM(prevNode: TableCellNode): boolean {
@@ -193,7 +194,6 @@ export function convertTableCellNodeElement(
   );
 
   return {
-    node: tableCellNode,
     forChild: (lexicalNode, parentLexicalNode) => {
       if ($isTableCellNode(parentLexicalNode) && !$isElementNode(lexicalNode)) {
         const paragraphNode = $createParagraphNode();
@@ -209,17 +209,20 @@ export function convertTableCellNodeElement(
 
       return lexicalNode;
     },
+    node: tableCellNode,
   };
 }
 
 export function $createTableCellNode(
   headerState: TableCellHeaderState,
-  colSpan?: number = 1,
-  width?: ?number,
+  colSpan = 1,
+  width?: number,
 ): TableCellNode {
   return new TableCellNode(headerState, colSpan, width);
 }
 
-export function $isTableCellNode(node: ?LexicalNode): boolean %checks {
+export function $isTableCellNode(
+  node: LexicalNode | null | undefined,
+): node is TableCellNode {
   return node instanceof TableCellNode;
 }

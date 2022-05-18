@@ -4,17 +4,26 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
+ */
+
+/**
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
  * @flow strict
  */
 
 import type {ElementNode, LexicalEditor, LexicalNode} from 'lexical';
 
 import {$getRoot, $isElementNode} from 'lexical';
-import invariant from 'shared/invariant';
+import invariant from 'shared-ts/invariant';
+import {Class} from 'utility-types';
 
-export type DFSNode = $ReadOnly<{
-  depth: number,
-  node: LexicalNode,
+export type DFSNode = Readonly<{
+  depth: number;
+  node: LexicalNode;
 }>;
 
 export function addClassNamesToElement(
@@ -51,6 +60,7 @@ export function $dfs(
   let depth = $getDepth(node);
   while (node !== null && !node.is(end)) {
     nodes.push({depth, node});
+
     if ($isElementNode(node) && node.getChildrenSize() > 0) {
       node = node.getFirstChild();
       depth++;
@@ -59,6 +69,7 @@ export function $dfs(
       let sibling = null;
       while (sibling === null && node !== null) {
         sibling = node.getNextSibling();
+
         if (sibling === null) {
           node = node.getParent();
           depth--;
@@ -68,6 +79,7 @@ export function $dfs(
       }
     }
   }
+
   if (node !== null && node.is(end)) {
     nodes.push({depth, node});
   }
@@ -83,17 +95,19 @@ function $getDepth(node: LexicalNode): number {
   return depth;
 }
 
-export function $getNearestNodeOfType<T: LexicalNode>(
+export function $getNearestNodeOfType<T = LexicalNode>(
   node: LexicalNode,
   klass: Class<T>,
 ): T | null {
   let parent = node;
+
   while (parent != null) {
     if (parent instanceof klass) {
       return parent;
     }
     parent = parent.getParent();
   }
+
   return parent;
 }
 
@@ -104,6 +118,7 @@ export function $getNearestBlockElementAncestorOrThrow(
     startNode,
     (node) => $isElementNode(node) && !node.isInline(),
   );
+
   if (!$isElementNode(blockNode)) {
     invariant(
       false,
@@ -111,17 +126,19 @@ export function $getNearestBlockElementAncestorOrThrow(
       startNode.__key,
     );
   }
+
   return blockNode;
 }
 
 export type DOMNodeToLexicalConversion = (element: Node) => LexicalNode;
-export type DOMNodeToLexicalConversionMap = {
-  [string]: DOMNodeToLexicalConversion,
-};
+export type DOMNodeToLexicalConversionMap = Record<
+  string,
+  DOMNodeToLexicalConversion
+>;
 
 export function $findMatchingParent(
   startingNode: LexicalNode,
-  findFn: (LexicalNode) => boolean,
+  findFn: (node: LexicalNode) => boolean,
 ): LexicalNode | null {
   let curr = startingNode;
 
@@ -144,22 +161,23 @@ export function mergeRegister(...func: Array<Func>): () => void {
   };
 }
 
-export function registerNestedElementResolver<N: ElementNode>(
+export function registerNestedElementResolver<N extends ElementNode>(
   editor: LexicalEditor,
   targetNode: Class<N>,
   cloneNode: (from: N) => N,
   handleOverlap: (from: N, to: N) => void,
 ): () => void {
-  const $isTargetNode = (node: ?LexicalNode): boolean %checks => {
+  const $isTargetNode = (node: LexicalNode | null | undefined): node is N => {
     return node instanceof targetNode;
   };
 
-  const $findMatch = (node: N): {child: ElementNode, parent: N} | null => {
+  const $findMatch = (node: N): {child: ElementNode; parent: N} | null => {
     // First validate we don't have any children that are of the target,
     // as we need to handle them first.
     const children = node.getChildren();
     for (let i = 0; i < children.length; i++) {
       const child = children[i];
+
       if ($isTargetNode(child)) {
         return null;
       }
@@ -169,6 +187,7 @@ export function registerNestedElementResolver<N: ElementNode>(
     while (parentNode !== null) {
       childNode = parentNode;
       parentNode = parentNode.getParent();
+
       if ($isTargetNode(parentNode)) {
         return {child: childNode, parent: parentNode};
       }
@@ -178,15 +197,18 @@ export function registerNestedElementResolver<N: ElementNode>(
 
   const elementNodeTransform = (node: N) => {
     const match = $findMatch(node);
+
     if (match !== null) {
       const {child, parent} = match;
 
       // Simple path, we can move child out and siblings into a new parent.
+
       if (child.is(node)) {
         handleOverlap(parent, node);
         const nextSiblings = child.getNextSiblings();
         const nextSiblingsLength = nextSiblings.length;
         parent.insertAfter(child);
+
         if (nextSiblingsLength !== 0) {
           const newParent = cloneNode(parent);
           child.insertAfter(newParent);
@@ -194,6 +216,7 @@ export function registerNestedElementResolver<N: ElementNode>(
             newParent.append(nextSiblings[i]);
           }
         }
+
         if (!parent.canBeEmpty() && parent.getChildrenSize() === 0) {
           parent.remove();
         }

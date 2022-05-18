@@ -4,7 +4,6 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- * @flow strict
  */
 
 import type {TableNode} from './LexicalTableNode';
@@ -46,7 +45,6 @@ import {$isTableCellNode} from './LexicalTableCellNode';
 import {TableSelection} from './LexicalTableSelection';
 
 const LEXICAL_ELEMENT_KEY = '__lexicalTableSelection';
-
 export function applyTableHandlers(
   tableNode: TableNode,
   tableElement: HTMLElement,
@@ -59,15 +57,12 @@ export function applyTableHandlers(
   }
 
   const tableSelection = new TableSelection(editor, tableNode.getKey());
-
   attachTableSelectionToTableElement(tableElement, tableSelection);
-
   let isMouseDown = false;
   let isRangeSelectionHijacked = false;
-
   tableElement.addEventListener('dblclick', (event: MouseEvent) => {
-    // $FlowFixMe: event.target is always a Node on the DOM
     const cell = getCellFromTarget(event.target);
+
     if (cell !== null) {
       event.preventDefault();
       event.stopImmediatePropagation();
@@ -77,7 +72,6 @@ export function applyTableHandlers(
       isMouseDown = false;
     }
   });
-
   // This is the anchor of the selection.
   tableElement.addEventListener('mousedown', (event: MouseEvent) => {
     setTimeout(() => {
@@ -87,9 +81,9 @@ export function applyTableHandlers(
 
       // $FlowFixMe: event.target is always a Node on the DOM
       const cell = getCellFromTarget(event.target);
+
       if (cell !== null) {
         tableSelection.setAnchorCellForSelection(cell);
-
         document.addEventListener(
           'mouseup',
           () => {
@@ -103,7 +97,6 @@ export function applyTableHandlers(
       }
     }, 0);
   });
-
   // This is adjusting the focus of the selection.
   tableElement.addEventListener('mousemove', (event: MouseEvent) => {
     if (isRangeSelectionHijacked) {
@@ -115,9 +108,11 @@ export function applyTableHandlers(
     if (isMouseDown) {
       // $FlowFixMe: event.target is always a Node on the DOM
       const cell = getCellFromTarget(event.target);
+
       if (cell !== null) {
         const cellX = cell.x;
         const cellY = cell.y;
+
         if (
           isMouseDown &&
           (tableSelection.startX !== cellX ||
@@ -132,13 +127,11 @@ export function applyTableHandlers(
     } else {
     }
   });
-
   tableElement.addEventListener('mouseup', (event: MouseEvent) => {
     if (isMouseDown) {
       isMouseDown = false;
     }
   });
-
   // Select entire table at this point, when grid selection is ready.
   tableElement.addEventListener('mouseleave', (event: MouseEvent) => {
     if (isMouseDown) {
@@ -168,7 +161,6 @@ export function applyTableHandlers(
   };
 
   window.addEventListener('mousedown', mouseDownCallback);
-
   tableSelection.listenersToRemove.add(() =>
     window.removeEventListener('mousedown', mouseDownCallback),
   );
@@ -178,22 +170,18 @@ export function applyTableHandlers(
   };
 
   window.addEventListener('mouseup', mouseUpCallback);
-
   tableSelection.listenersToRemove.add(() =>
     window.removeEventListener('mouseup', mouseUpCallback),
   );
-
   tableSelection.listenersToRemove.add(
-    editor.registerCommand(
+    editor.registerCommand<KeyboardEvent>(
       KEY_ARROW_DOWN_COMMAND,
-      (payload) => {
+      (event) => {
         const selection = $getSelection();
 
         if (!$isSelectionInTable(selection, tableNode)) {
           return false;
         }
-
-        const event: KeyboardEvent = payload;
 
         const direction = 'down';
 
@@ -222,7 +210,6 @@ export function applyTableHandlers(
             }
 
             const lastChild = tableCellNode.getLastChild();
-
             const isSelectionInLastBlock =
               (lastChild && elementParentNode.isParentOf(lastChild)) ||
               elementParentNode === lastChild;
@@ -241,7 +228,6 @@ export function applyTableHandlers(
                     tableSelection.grid,
                   ),
                 );
-
                 return adjustFocusNodeInDirection(
                   tableSelection,
                   tableNode,
@@ -271,11 +257,9 @@ export function applyTableHandlers(
             tableCellNode,
             tableSelection.grid,
           );
-
           event.preventDefault();
           event.stopImmediatePropagation();
           event.stopPropagation();
-
           return adjustFocusNodeInDirection(
             tableSelection,
             tableNode,
@@ -301,7 +285,6 @@ export function applyTableHandlers(
         }
 
         const event: KeyboardEvent = payload;
-
         const direction = 'up';
 
         if ($isRangeSelection(selection)) {
@@ -329,7 +312,6 @@ export function applyTableHandlers(
             }
 
             const lastChild = tableCellNode.getLastChild();
-
             const isSelectionInLastBlock =
               (lastChild && elementParentNode.isParentOf(lastChild)) ||
               elementParentNode === lastChild;
@@ -348,7 +330,6 @@ export function applyTableHandlers(
                     tableSelection.grid,
                   ),
                 );
-
                 return adjustFocusNodeInDirection(
                   tableSelection,
                   tableNode,
@@ -378,11 +359,9 @@ export function applyTableHandlers(
             tableCellNode,
             tableSelection.grid,
           );
-
           event.preventDefault();
           event.stopImmediatePropagation();
           event.stopPropagation();
-
           return adjustFocusNodeInDirection(
             tableSelection,
             tableNode,
@@ -408,7 +387,6 @@ export function applyTableHandlers(
         }
 
         const event: KeyboardEvent = payload;
-
         const direction = 'backward';
 
         if ($isRangeSelection(selection)) {
@@ -449,7 +427,6 @@ export function applyTableHandlers(
                     tableSelection.grid,
                   ),
                 );
-
                 return adjustFocusNodeInDirection(
                   tableSelection,
                   tableNode,
@@ -479,11 +456,9 @@ export function applyTableHandlers(
             tableCellNode,
             tableSelection.grid,
           );
-
           event.preventDefault();
           event.stopImmediatePropagation();
           event.stopPropagation();
-
           return adjustFocusNodeInDirection(
             tableSelection,
             tableNode,
@@ -509,7 +484,6 @@ export function applyTableHandlers(
         }
 
         const event: KeyboardEvent = payload;
-
         const direction = 'forward';
 
         if ($isRangeSelection(selection)) {
@@ -554,7 +528,6 @@ export function applyTableHandlers(
                     tableSelection.grid,
                   ),
                 );
-
                 return adjustFocusNodeInDirection(
                   tableSelection,
                   tableNode,
@@ -584,11 +557,9 @@ export function applyTableHandlers(
             tableCellNode,
             tableSelection.grid,
           );
-
           event.preventDefault();
           event.stopImmediatePropagation();
           event.stopPropagation();
-
           return adjustFocusNodeInDirection(
             tableSelection,
             tableNode,
@@ -663,7 +634,6 @@ export function applyTableHandlers(
           const event: KeyboardEvent = payload;
           event.preventDefault();
           event.stopPropagation();
-
           tableSelection.clearText();
           return true;
         } else if ($isRangeSelection(selection)) {
@@ -768,7 +738,6 @@ export function applyTableHandlers(
               tableSelection.grid,
             );
             event.preventDefault();
-
             selectGridNodeInDirection(
               tableSelection,
               tableNode,
@@ -776,7 +745,6 @@ export function applyTableHandlers(
               currentCords.y,
               !event.shiftKey ? 'forward' : 'backward',
             );
-
             return true;
           }
         }
@@ -786,7 +754,6 @@ export function applyTableHandlers(
       COMMAND_PRIORITY_CRITICAL,
     ),
   );
-
   tableSelection.listenersToRemove.add(
     editor.registerCommand(
       FOCUS_COMMAND,
@@ -796,7 +763,6 @@ export function applyTableHandlers(
       COMMAND_PRIORITY_CRITICAL,
     ),
   );
-
   tableSelection.listenersToRemove.add(
     editor.registerCommand(
       SELECTION_CHANGE_COMMAND,
@@ -814,7 +780,6 @@ export function applyTableHandlers(
               ? selection
               : null,
           );
-
           return false;
         }
 
@@ -874,7 +839,6 @@ export function applyTableHandlers(
   );
   return tableSelection;
 }
-
 export function attachTableSelectionToTableElement(
   tableElement: HTMLElement,
   tableSelection: TableSelection,
@@ -882,31 +846,34 @@ export function attachTableSelectionToTableElement(
   // $FlowFixMe
   tableElement[LEXICAL_ELEMENT_KEY] = tableSelection;
 }
-
 export function getTableSelectionFromTableElement(
   tableElement: HTMLElement,
 ): TableSelection {
   // $FlowFixMe
   return tableElement[LEXICAL_ELEMENT_KEY];
 }
-
 export function getCellFromTarget(node: Node): Cell | null {
   let currentNode = node;
+
   while (currentNode != null) {
     const nodeName = currentNode.nodeName;
+
     if (nodeName === 'TD' || nodeName === 'TH') {
       // $FlowFixMe: internal field
       const cell = currentNode._cell;
+
       if (cell === undefined) {
         return null;
       }
+
       return cell;
     }
+
     currentNode = currentNode.parentNode;
   }
+
   return null;
 }
-
 export function getTableGrid(tableElement: HTMLElement): Grid {
   const cells: Cells = [];
   const grid = {
@@ -914,15 +881,14 @@ export function getTableGrid(tableElement: HTMLElement): Grid {
     columns: 0,
     rows: 0,
   };
-
   let currentNode = tableElement.firstChild;
   let x = 0;
   let y = 0;
-
   cells.length = 0;
 
   while (currentNode != null) {
     const nodeMame = currentNode.nodeName;
+
     if (nodeMame === 'TD' || nodeMame === 'TH') {
       // $FlowFixMe: TD is always an HTMLElement
       const elem: HTMLElement = currentNode;
@@ -934,47 +900,54 @@ export function getTableGrid(tableElement: HTMLElement): Grid {
       };
       // $FlowFixMe: internal field
       currentNode._cell = cell;
+
       if (cells[y] === undefined) {
         cells[y] = [];
       }
+
       cells[y][x] = cell;
     } else {
       const child = currentNode.firstChild;
+
       if (child != null) {
         currentNode = child;
         continue;
       }
     }
+
     const sibling = currentNode.nextSibling;
+
     if (sibling != null) {
       x++;
       currentNode = sibling;
       continue;
     }
+
     const parent = currentNode.parentNode;
+
     if (parent != null) {
       const parentSibling = parent.nextSibling;
+
       if (parentSibling == null) {
         break;
       }
+
       y++;
       x = 0;
       currentNode = parentSibling;
     }
   }
+
   grid.columns = x + 1;
   grid.rows = y + 1;
-
   return grid;
 }
-
 export function $updateDOMForSelection(
   grid: Grid,
   selection: GridSelection | RangeSelection | null,
 ): Array<Cell> {
   const highlightedCells = [];
   const selectedCellNodes = new Set(selection ? selection.getNodes() : []);
-
   $forEachGridCell(grid, (cell, lexicalNode) => {
     const elem = cell.elem;
 
@@ -993,31 +966,37 @@ export function $updateDOMForSelection(
       }
     }
   });
-
   return highlightedCells;
 }
-
 export function $forEachGridCell(
   grid: Grid,
   cb: (
     cell: Cell,
     lexicalNode: LexicalNode,
-    cords: {x: number, y: number},
+    cords: {
+      x: number;
+      y: number;
+    },
   ) => void,
 ) {
   const {cells} = grid;
+
   for (let y = 0; y < cells.length; y++) {
     const row = cells[y];
+
     for (let x = 0; x < row.length; x++) {
       const cell = row[x];
       const lexicalNode = $getNearestNodeFromDOMNode(cell.elem);
+
       if (lexicalNode !== null) {
-        cb(cell, lexicalNode, {x, y});
+        cb(cell, lexicalNode, {
+          x,
+          y,
+        });
       }
     }
   }
 }
-
 export function $addHighlightStyleToTable(tableSelection: TableSelection) {
   tableSelection.disableHighlightStyle();
   $forEachGridCell(tableSelection.grid, (cell) => {
@@ -1027,7 +1006,6 @@ export function $addHighlightStyleToTable(tableSelection: TableSelection) {
     elem.style.setProperty('caret-color', 'transparent');
   });
 }
-
 export function $removeHighlightStyleToTable(tableSelection: TableSelection) {
   tableSelection.enableHighlightStyle();
   $forEachGridCell(tableSelection.grid, (cell) => {
@@ -1035,6 +1013,7 @@ export function $removeHighlightStyleToTable(tableSelection: TableSelection) {
     cell.highlighted = false;
     elem.style.removeProperty('background-color');
     elem.style.removeProperty('caret-color');
+
     if (!elem.getAttribute('style')) {
       elem.removeAttribute('style');
     }
@@ -1050,7 +1029,7 @@ const selectGridNodeInDirection = (
 ): boolean => {
   switch (direction) {
     case 'backward':
-    case 'forward': {
+    case 'forward':
       const isForward = direction === 'forward';
 
       if (x !== (isForward ? tableSelection.grid.columns - 1 : 0)) {
@@ -1076,10 +1055,11 @@ const selectGridNodeInDirection = (
           tableNode.selectNext();
         }
       }
-      return true;
-    }
 
-    case 'up': {
+      return true;
+
+
+    case 'up': 
       if (y !== 0) {
         selectTableCellNode(
           tableNode.getCellNodeFromCordsOrThrow(x, y - 1, tableSelection.grid),
@@ -1087,10 +1067,11 @@ const selectGridNodeInDirection = (
       } else {
         tableNode.selectPrevious();
       }
-      return true;
-    }
 
-    case 'down': {
+      return true;
+    
+
+    case 'down': 
       if (y !== tableSelection.grid.rows - 1) {
         selectTableCellNode(
           tableNode.getCellNodeFromCordsOrThrow(x, y + 1, tableSelection.grid),
@@ -1098,11 +1079,11 @@ const selectGridNodeInDirection = (
       } else {
         tableNode.selectNext();
       }
-      return true;
-    }
-  }
 
-  return false;
+      return true;
+    default:
+      return false
+  }
 };
 
 const adjustFocusNodeInDirection = (
@@ -1150,7 +1131,6 @@ const adjustFocusNodeInDirection = (
       } else {
         return false;
       }
-    }
   }
 
   return false;
@@ -1165,6 +1145,7 @@ function $isSelectionInTable(
     const isFocusInside = tableNode.isParentOf(selection.focus.getNode());
     return isAnchorInside && isFocusInside;
   }
+
   return false;
 }
 

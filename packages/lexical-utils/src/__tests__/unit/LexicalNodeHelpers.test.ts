@@ -4,7 +4,6 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- * @flow strict
  */
 
 import {
@@ -20,12 +19,7 @@ import {
   $createTestElementNode,
   initializeUnitTest,
 } from 'lexical/src/__tests__/utils';
-
 import {$dfs} from '../..';
-
-// No idea why we suddenly need to do this, but it fixes the tests
-// with latest experimental React version.
-global.IS_REACT_ACT_ENVIRONMENT = true;
 
 describe('LexicalNodeHelpers tests', () => {
   initializeUnitTest((testEnv) => {
@@ -57,25 +51,62 @@ describe('LexicalNodeHelpers tests', () => {
         paragraph1.append(block1, block2);
         paragraph2.append(text4, text5);
         text5.toggleFormat('bold'); // Prevent from merging with text 4
+
         paragraph2.append(block3);
         block1.append(text1);
         block2.append(text2, text3);
         text3.toggleFormat('bold'); // Prevent from merging with text2
-        block3.append(text6);
 
+        block3.append(text6);
         expectedKeys = [
-          {depth: 0, node: root.getKey()},
-          {depth: 1, node: paragraph1.getKey()},
-          {depth: 2, node: block1.getKey()},
-          {depth: 3, node: text1.getKey()},
-          {depth: 2, node: block2.getKey()},
-          {depth: 3, node: text2.getKey()},
-          {depth: 3, node: text3.getKey()},
-          {depth: 1, node: paragraph2.getKey()},
-          {depth: 2, node: text4.getKey()},
-          {depth: 2, node: text5.getKey()},
-          {depth: 2, node: block3.getKey()},
-          {depth: 3, node: text6.getKey()},
+          {
+            depth: 0,
+            node: root.getKey(),
+          },
+          {
+            depth: 1,
+            node: paragraph1.getKey(),
+          },
+          {
+            depth: 2,
+            node: block1.getKey(),
+          },
+          {
+            depth: 3,
+            node: text1.getKey(),
+          },
+          {
+            depth: 2,
+            node: block2.getKey(),
+          },
+          {
+            depth: 3,
+            node: text2.getKey(),
+          },
+          {
+            depth: 3,
+            node: text3.getKey(),
+          },
+          {
+            depth: 1,
+            node: paragraph2.getKey(),
+          },
+          {
+            depth: 2,
+            node: text4.getKey(),
+          },
+          {
+            depth: 2,
+            node: text5.getKey(),
+          },
+          {
+            depth: 2,
+            node: block3.getKey(),
+          },
+          {
+            depth: 3,
+            node: text6.getKey(),
+          },
         ];
       });
       editor.getEditorState().read(() => {
@@ -95,7 +126,6 @@ describe('LexicalNodeHelpers tests', () => {
         expect($dfs($getRoot())).toEqual(expectedNodes);
       });
     });
-
     test('DFS triggers getLatest()', async () => {
       const editor: LexicalEditor = testEnv.editor;
       let rootKey;
@@ -121,13 +151,27 @@ describe('LexicalNodeHelpers tests', () => {
         const block2 = $getNodeByKey(block2Key);
         const block3 = $createTestElementNode();
         block1.append(block3);
-
         expect($dfs(root)).toEqual([
-          {depth: 0, node: root.getLatest()},
-          {depth: 1, node: paragraph.getLatest()},
-          {depth: 2, node: block1.getLatest()},
-          {depth: 3, node: block3.getLatest()},
-          {depth: 2, node: block2.getLatest()},
+          {
+            depth: 0,
+            node: root.getLatest(),
+          },
+          {
+            depth: 1,
+            node: paragraph.getLatest(),
+          },
+          {
+            depth: 2,
+            node: block1.getLatest(),
+          },
+          {
+            depth: 3,
+            node: block3.getLatest(),
+          },
+          {
+            depth: 2,
+            node: block2.getLatest(),
+          },
         ]);
       });
     });

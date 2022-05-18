@@ -12,6 +12,7 @@ Object.defineProperty(HTMLElement.prototype, 'contentEditable', {
   get() {
     return this.getAttribute('contenteditable');
   },
+
   set(value) {
     this.setAttribute('contenteditable', value);
   },
@@ -19,7 +20,7 @@ Object.defineProperty(HTMLElement.prototype, 'contentEditable', {
 
 if (!Selection.prototype.modify) {
   const wordBreakPolyfillRegex =
-    /[\s.,\\\/#!$%\^&\*;:{}=\-`~()\uD800-\uDBFF\uDC00-\uDFFF\u3000-\u303F]/;
+    /[\s.,\\/#!$%^&*;:{}=\-`~()\uD800-\uDBFF\uDC00-\uDFFF\u3000-\u303F]/u;
 
   const pushSegment = function (
     segments: Array<Segment>,
@@ -39,6 +40,7 @@ if (!Selection.prototype.modify) {
     let wordString = '';
     let nonWordString = '';
     let i;
+
     for (i = 0; i < string.length; i++) {
       const char = string[i];
 
@@ -47,21 +49,26 @@ if (!Selection.prototype.modify) {
           pushSegment(segments, i, wordString, true);
           wordString = '';
         }
+
         nonWordString += char;
       } else {
         if (nonWordString !== '') {
           pushSegment(segments, i, nonWordString, false);
           nonWordString = '';
         }
+
         wordString += char;
       }
     }
+
     if (wordString !== '') {
       pushSegment(segments, i, wordString, true);
     }
+
     if (nonWordString !== '') {
       pushSegment(segments, i, nonWordString, false);
     }
+
     return segments;
   };
 
@@ -91,12 +98,15 @@ if (!Selection.prototype.modify) {
       if (direction === 'backward') {
         if (anchorOffset === 0) {
           let prevSibling = anchorNode.previousSibling;
+
           if (prevSibling === null) {
             prevSibling = anchorNode.parentElement.previousSibling.lastChild;
           }
+
           if (prevSibling.nodeName === 'P') {
             prevSibling = prevSibling.firstChild;
           }
+
           if (prevSibling.nodeName === 'BR') {
             anchor.node = prevSibling;
             anchor.offset = 0;
@@ -119,12 +129,15 @@ if (!Selection.prototype.modify) {
                 anchorNode.firstChild.nodeName === 'BR')))
         ) {
           let nextSibling = anchorNode.nextSibling;
+
           if (nextSibling === null) {
             nextSibling = anchorNode.parentElement.nextSibling.lastChild;
           }
+
           if (nextSibling.nodeName === 'P') {
             nextSibling = nextSibling.lastChild;
           }
+
           if (nextSibling.nodeName === 'BR') {
             anchor.node = nextSibling;
             anchor.offset = 0;
@@ -176,11 +189,14 @@ if (!Selection.prototype.modify) {
           }
         }
       }
+
       if (direction === 'forward') {
         index += anchor.offset;
       }
+
       anchor.offset = index;
     }
+
     if (alter === 'move') {
       focus.offset = anchor.offset;
       focus.node = anchor.node;
@@ -193,167 +209,144 @@ export function printWhitespace(whitespaceCharacter) {
     ? '&nbsp;'
     : whitespaceCharacter;
 }
-
 export function insertText(text) {
   return {
     text,
     type: 'insert_text',
   };
 }
-
 export function insertImmutableNode(text) {
   return {
     text,
     type: 'insert_immutable_node',
   };
 }
-
 export function insertSegmentedNode(text) {
   return {
     text,
     type: 'insert_segmented_node',
   };
 }
-
 export function convertToImmutableNode() {
   return {
     text: null,
     type: 'covert_to_immutable_node',
   };
 }
-
 export function convertToSegmentedNode() {
   return {
     text: null,
     type: 'covert_to_segmented_node',
   };
 }
-
 export function insertParagraph(text) {
   return {
     type: 'insert_paragraph',
   };
 }
-
-export function deleteWordBackward(n: ?number) {
+export function deleteWordBackward(n: number | null | undefined) {
   return {
     text: null,
     times: n,
     type: 'delete_word_backward',
   };
 }
-
-export function deleteWordForward(n: ?number) {
+export function deleteWordForward(n: number | null | undefined) {
   return {
     text: null,
     times: n,
     type: 'delete_word_forward',
   };
 }
-
-export function moveBackward(n: ?number) {
+export function moveBackward(n: number | null | undefined) {
   return {
     text: null,
     times: n,
     type: 'move_backward',
   };
 }
-
-export function moveForward(n: ?number) {
+export function moveForward(n: number | null | undefined) {
   return {
     text: null,
     times: n,
     type: 'move_forward',
   };
 }
-
 export function moveEnd() {
   return {
     type: 'move_end',
   };
 }
-
-export function deleteBackward(n: ?number) {
+export function deleteBackward(n: number | null | undefined) {
   return {
     text: null,
     times: n,
     type: 'delete_backward',
   };
 }
-
-export function deleteForward(n: ?number) {
+export function deleteForward(n: number | null | undefined) {
   return {
     text: null,
     times: n,
     type: 'delete_forward',
   };
 }
-
 export function formatBold() {
   return {
     format: 'bold',
     type: 'format_text',
   };
 }
-
 export function formatItalic() {
   return {
     format: 'italic',
     type: 'format_text',
   };
 }
-
 export function formatStrikeThrough() {
   return {
     format: 'strikethrough',
     type: 'format_text',
   };
 }
-
 export function formatUnderline() {
   return {
     format: 'underline',
     type: 'format_text',
   };
 }
-
-export function redo(n: ?number) {
+export function redo(n: number | null | undefined) {
   return {
     text: null,
     times: n,
     type: 'redo',
   };
 }
-
-export function undo(n: ?number) {
+export function undo(n: number | null | undefined) {
   return {
     text: null,
     times: n,
     type: 'undo',
   };
 }
-
 export function pastePlain(text: string) {
   return {
     text: text,
     type: 'paste_plain',
   };
 }
-
 export function pasteLexical(text: string) {
   return {
     text: text,
     type: 'paste_lexical',
   };
 }
-
 export function pasteHTML(text: string) {
   return {
     text: text,
     type: 'paste_html',
   };
 }
-
 export function moveNativeSelection(
   anchorPath,
   anchorOffset,
@@ -368,15 +361,15 @@ export function moveNativeSelection(
     type: 'move_native_selection',
   };
 }
-
 export function getNodeFromPath(path, rootElement) {
   let node = rootElement;
+
   for (let i = 0; i < path.length; i++) {
     node = node.childNodes[path[i]];
   }
+
   return node;
 }
-
 export function setNativeSelection(
   anchorNode,
   anchorOffset,
@@ -393,7 +386,6 @@ export function setNativeSelection(
     document.dispatchEvent(new Event('selectionchange'));
   });
 }
-
 export function setNativeSelectionWithPaths(
   rootElement,
   anchorPath,
@@ -413,23 +405,31 @@ function getLastTextNode(startingNode) {
     if (node !== startingNode && node.nodeType === 3) {
       return node;
     }
+
     const child = node.lastChild;
+
     if (child !== null) {
       node = child;
       continue;
     }
+
     const previousSibling = node.previousSibling;
+
     if (previousSibling !== null) {
       node = previousSibling;
       continue;
     }
+
     let parent = node.parentNode;
+
     while (parent !== null) {
       const parentSibling = parent.previousSibling;
+
       if (parentSibling !== null) {
         node = parentSibling;
         continue mainLoop;
       }
+
       parent = parent.parentNode;
     }
   }
@@ -444,23 +444,31 @@ function getNextTextNode(startingNode) {
     if (node !== startingNode && node.nodeType === 3) {
       return node;
     }
+
     const child = node.firstChild;
+
     if (child !== null) {
       node = child;
       continue;
     }
+
     const nextSibling = node.nextSibling;
+
     if (nextSibling !== null) {
       node = nextSibling;
       continue;
     }
+
     let parent = node.parentNode;
+
     while (parent !== null) {
       const parentSibling = parent.nextSibling;
+
       if (parentSibling !== null) {
         node = parentSibling;
         continue mainLoop;
       }
+
       parent = parent.parentNode;
     }
   }
@@ -482,6 +490,7 @@ function moveNativeSelectionBackward() {
       keyCode: 37,
     });
     target.dispatchEvent(keyDownEvent);
+
     if (!keyDownEvent.defaultPrevented) {
       if (anchorNode.nodeType === 3) {
         if (anchorOffset === 0) {
@@ -515,11 +524,13 @@ function moveNativeSelectionBackward() {
         } else {
           anchorOffset--;
         }
+
         setNativeSelection(anchorNode, anchorOffset, anchorNode, anchorOffset);
       } else {
         throw new Error('moveNativeSelectionBackward: TODO');
       }
     }
+
     const keyUpEvent = new KeyboardEvent('keyup', {
       bubbles: true,
       cancelable: true,
@@ -546,9 +557,11 @@ function moveNativeSelectionForward() {
       keyCode: 39,
     });
     target.dispatchEvent(keyDownEvent);
+
     if (!keyDownEvent.defaultPrevented) {
       if (anchorNode.nodeType === 3) {
         const text = anchorNode.nodeValue;
+
         if (text.length === anchorOffset) {
           const nextTextNode = getNextTextNode(anchorNode);
 
@@ -569,6 +582,7 @@ function moveNativeSelectionForward() {
         throw new Error('moveNativeSelectionForward: TODO');
       }
     }
+
     const keyUpEvent = new KeyboardEvent('keyup', {
       bubbles: true,
       cancelable: true,
@@ -583,6 +597,7 @@ function moveNativeSelectionForward() {
 
 export async function applySelectionInputs(inputs, update, editor) {
   const rootElement = editor.getRootElement();
+
   for (let i = 0; i < inputs.length; i++) {
     const input = inputs[i];
     const times = input?.times ?? 1;
@@ -596,45 +611,57 @@ export async function applySelectionInputs(inputs, update, editor) {
             selection.insertText(input.text);
             break;
           }
+
           case 'insert_paragraph': {
             selection.insertParagraph();
             break;
           }
+
           case 'move_backward': {
             moveNativeSelectionBackward();
             break;
           }
+
           case 'move_forward': {
             moveNativeSelectionForward();
             break;
           }
+
           case 'move_end': {
             const anchorNode = selection.anchor.getNode();
+
             if ($isTextNode(anchorNode)) {
               anchorNode.select();
             }
+
             break;
           }
+
           case 'delete_backward': {
             selection.deleteCharacter(true);
             break;
           }
+
           case 'delete_forward': {
             selection.deleteCharacter(false);
             break;
           }
+
           case 'delete_word_backward': {
             selection.deleteWord(true);
             break;
           }
+
           case 'delete_word_forward': {
             selection.deleteWord(false);
             break;
           }
+
           case 'format_text': {
             selection.formatText(input.format);
             break;
           }
+
           case 'move_native_selection': {
             setNativeSelectionWithPaths(
               rootElement,
@@ -645,12 +672,14 @@ export async function applySelectionInputs(inputs, update, editor) {
             );
             break;
           }
+
           case 'insert_immutable_node': {
             const text = $createTextNode(input.text);
             text.setMode('immutable');
             selection.insertNodes([text]);
             break;
           }
+
           case 'insert_segmented_node': {
             const text = $createTextNode(input.text);
             text.setMode('segmented');
@@ -658,6 +687,7 @@ export async function applySelectionInputs(inputs, update, editor) {
             text.selectNext();
             break;
           }
+
           case 'covert_to_immutable_node': {
             const text = $createTextNode(selection.getTextContent());
             text.setMode('immutable');
@@ -665,6 +695,7 @@ export async function applySelectionInputs(inputs, update, editor) {
             text.selectNext();
             break;
           }
+
           case 'covert_to_segmented_node': {
             const text = $createTextNode(selection.getTextContent());
             text.setMode('segmented');
@@ -672,6 +703,7 @@ export async function applySelectionInputs(inputs, update, editor) {
             text.selectNext();
             break;
           }
+
           case 'undo': {
             rootElement.dispatchEvent(
               new KeyboardEvent('keydown', {
@@ -684,6 +716,7 @@ export async function applySelectionInputs(inputs, update, editor) {
             );
             break;
           }
+
           case 'redo': {
             rootElement.dispatchEvent(
               new KeyboardEvent('keydown', {
@@ -697,6 +730,7 @@ export async function applySelectionInputs(inputs, update, editor) {
             );
             break;
           }
+
           case 'paste_plain': {
             rootElement.dispatchEvent(
               Object.assign(
@@ -710,6 +744,7 @@ export async function applySelectionInputs(inputs, update, editor) {
                       if (type === 'text/plain') {
                         return input.text;
                       }
+
                       return '';
                     },
                   },
@@ -718,6 +753,7 @@ export async function applySelectionInputs(inputs, update, editor) {
             );
             break;
           }
+
           case 'paste_lexical': {
             rootElement.dispatchEvent(
               Object.assign(
@@ -731,6 +767,7 @@ export async function applySelectionInputs(inputs, update, editor) {
                       if (type === 'application/x-lexical-nodes') {
                         return input.text;
                       }
+
                       return '';
                     },
                   },
@@ -739,6 +776,7 @@ export async function applySelectionInputs(inputs, update, editor) {
             );
             break;
           }
+
           case 'paste_html': {
             rootElement.dispatchEvent(
               Object.assign(
@@ -752,6 +790,7 @@ export async function applySelectionInputs(inputs, update, editor) {
                       if (type === 'text/html') {
                         return input.text;
                       }
+
                       return '';
                     },
                   },
@@ -765,27 +804,29 @@ export async function applySelectionInputs(inputs, update, editor) {
     }
   }
 }
-
 export function setAnchorPoint(point) {
   let selection = $getSelection();
+
   if (selection === null) {
     const dummyTextNode = $createTextNode();
     dummyTextNode.select();
     selection = $getSelection();
   }
+
   const anchor = selection.anchor;
   anchor.type = point.type;
   anchor.offset = point.offset;
   anchor.key = point.key;
 }
-
 export function setFocusPoint(point) {
   let selection = $getSelection();
+
   if (selection === null) {
     const dummyTextNode = $createTextNode();
     dummyTextNode.select();
     selection = $getSelection();
   }
+
   const focus = selection.focus;
   focus.type = point.type;
   focus.offset = point.offset;
