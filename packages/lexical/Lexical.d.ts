@@ -345,10 +345,10 @@ export declare class LexicalNode {
   getTopLevelElementOrThrow(): ElementNode;
   getParents(): Array<ElementNode>;
   getParentKeys(): Array<NodeKey>;
-  getPreviousSibling(): LexicalNode | null;
-  getPreviousSiblings(): Array<LexicalNode>;
-  getNextSibling(): LexicalNode | null;
-  getNextSiblings(): Array<LexicalNode>;
+  getPreviousSibling<T extends LexicalNode>(): T | null;
+  getPreviousSiblings<T extends LexicalNode>(): Array<T>;
+  getNextSibling<T extends LexicalNode>(): T | null;
+  getNextSiblings<T extends LexicalNode>(): Array<T>;
   getCommonAncestor(node: LexicalNode): ElementNode | null;
   is(object: LexicalNode | null | undefined): boolean;
   isBefore(targetNode: LexicalNode): boolean;

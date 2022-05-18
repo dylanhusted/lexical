@@ -347,10 +347,10 @@ declare export class LexicalNode {
   getTopLevelElementOrThrow(): ElementNode;
   getParents(): Array<ElementNode>;
   getParentKeys(): Array<NodeKey>;
-  getPreviousSibling(): LexicalNode | null;
-  getPreviousSiblings(): Array<LexicalNode>;
-  getNextSibling(): LexicalNode | null;
-  getNextSiblings(): Array<LexicalNode>;
+  getPreviousSibling<T: LexicalNode>(): T | null;
+  getPreviousSiblings<T: LexicalNode>(): Array<T>;
+  getNextSibling<T: LexicalNode>(): T | null;
+  getNextSiblings<T: LexicalNode>(): Array<T>;
   getCommonAncestor(node: LexicalNode): ElementNode | null;
   is(object: ?LexicalNode): boolean;
   isBefore(targetNode: LexicalNode): boolean;

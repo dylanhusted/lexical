@@ -45,6 +45,7 @@ export declare class ListNode extends ElementNode {
   canBeEmpty(): false;
   append(...nodesToAppend: LexicalNode[]): ListNode;
   getTag(): ListNodeTagType;
+  getStart(): number;
   getListType(): ListType;
 }
 export function outdentList(): void;

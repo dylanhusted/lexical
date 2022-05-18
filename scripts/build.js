@@ -423,7 +423,7 @@ const packages = [
     modules: [
       {
         outputFileName: 'LexicalOffset',
-        sourceFileName: 'index.js',
+        sourceFileName: 'index.ts',
       },
     ],
     name: 'Lexical Offset',
@@ -467,7 +467,7 @@ const packages = [
     modules: [
       {
         outputFileName: 'LexicalLink',
-        sourceFileName: 'index.js',
+        sourceFileName: 'index.ts',
       },
     ],
     name: 'Lexical Link',
@@ -478,7 +478,7 @@ const packages = [
     modules: [
       {
         outputFileName: 'LexicalOverflow',
-        sourceFileName: 'index.js',
+        sourceFileName: 'index.ts',
       },
     ],
     name: 'Lexical Overflow',
@@ -511,7 +511,7 @@ const packages = [
     modules: [
       {
         outputFileName: 'LexicalMarkdown',
-        sourceFileName: 'index.js',
+        sourceFileName: 'index.ts',
       },
     ],
     name: 'Lexical Markdown',
