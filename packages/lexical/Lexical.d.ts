@@ -339,11 +339,11 @@ export declare class LexicalNode {
   isSelected(): boolean;
   getKey(): NodeKey;
   getIndexWithinParent(): number;
-  getParent(): ElementNode | null;
-  getParentOrThrow(): ElementNode;
-  getTopLevelElement(): null | ElementNode;
-  getTopLevelElementOrThrow(): ElementNode;
-  getParents(): Array<ElementNode>;
+  getParent<T extends ElementNode>(): T | null;
+  getParentOrThrow<T extends ElementNode>(): T;
+  getTopLevelElement<T extends RootNode>(): T | null;
+  getTopLevelElementOrThrow<T extends RootNode>(): T;
+  getParents<T extends ElementNode>(): Array<T>;
   getParentKeys(): Array<NodeKey>;
   getPreviousSibling<T extends LexicalNode>(): T | null;
   getPreviousSiblings<T extends LexicalNode>(): Array<T>;
